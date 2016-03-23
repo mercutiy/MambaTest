@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">MambaTest</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="text_view_login">Login</string>
+    <string name="text_view_password">Password</string>
+    <string name="button_login">Login!</string>
+
+    <string name="notice_wrong_login">Wrong login or/and password</string>
+    <string name="notice_right_login">Ok, you are logged in</string>
+    <string name="title_activity_profile">Profile</string>
+
+</resources>
