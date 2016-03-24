@@ -10,4 +10,15 @@
     <string name="notice_right_login">Ok, you are logged in</string>
     <string name="title_activity_profile">Profile</string>
 
+    <string name="string_its_you">(It\'s you)</string>
+
+    <plurals name="number_of_albums">
+        <item quantity="one">%d album</item>
+        <item quantity="other">%d albums</item>
+    </plurals>
+
+    <plurals name="number_of_contacts">
+        <item quantity="one">%d contact</item>
+        <item quantity="other">%d contacts</item>
+    </plurals>
 </resources>

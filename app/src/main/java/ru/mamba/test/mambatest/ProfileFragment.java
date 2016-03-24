@@ -1,13 +1,16 @@
 package ru.mamba.test.mambatest;
 
-import android.app.ActionBar;
+import android.app.Notification;
 import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,7 +28,7 @@ import ru.mamba.test.mambatest.fetcher.Request;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class ProfileFragment extends Fragment {
+public class ProfileFragment extends Fragment implements View.OnClickListener {
 
     private static final String TAG = LoginActivityFragment.class.getCanonicalName();
 
@@ -38,6 +41,10 @@ public class ProfileFragment extends Fragment {
 
     private TextView mInterests;
 
+    private Button mAlbumButton;
+
+    private Button mContactButton;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -46,6 +53,11 @@ public class ProfileFragment extends Fragment {
         mPhoto = (ImageView)view.findViewById(R.id.image_view_photo);
         mGreeting = (TextView)view.findViewById(R.id.text_view_slogan);
         mInterests = (TextView)view.findViewById(R.id.text_view_interests);
+        mAlbumButton = (Button)view.findViewById(R.id.button_albums);
+        mContactButton = (Button)view.findViewById(R.id.button_contacts);
+
+        mAlbumButton.setOnClickListener(this);
+        mContactButton.setOnClickListener(this);
 
         new LoginFetcher(getActivity()).execute();
 
@@ -59,6 +71,7 @@ public class ProfileFragment extends Fragment {
             super(context);
             JSONObject multiReq;
             try {
+                // TODO пробростиь anekta_id
                 multiReq = new JSONObject("{\"sysRequestsContainer\":[{\"method\":\"GET\", \"uri\":\"/profile/\", \"params\":{}}, {\"method\": \"GET\", \"uri\":\"/contacts/all/\", \"params\":{\"limit\": 1}}, {\"method\":\"GET\", \"uri\":\"/users/634593392/albums/\", \"params\":{}}]}");
             } catch (JSONException e) {
                 Log.e(TAG, "Error parsing json", e);
@@ -115,16 +128,31 @@ public class ProfileFragment extends Fragment {
 
                 mInterests.setText(interests);
 
-                String title = name + " " + String.valueOf(age) + " " + R.string.button_login;
+                // TODO age == 0 Скрытый возраст
+                String title = name + " " + String.valueOf(age) + " " + getResources().getString(R.string.string_its_you);
 
-                ActionBar ab =  getActivity().getActionBar();
+                ActionBar ab = ((AppCompatActivity)getActivity()).getSupportActionBar();
+                //ActionBar ab =  getActivity().getActionBar();
                 if (ab != null) {
                     ab.setTitle(title);
                 }
 
+                mAlbumButton.setText(getResources().getQuantityString(R.plurals.number_of_albums, albums, albums));
+
+                mContactButton.setText(getResources().getQuantityString(R.plurals.number_of_contacts, contacts, contacts));
+
             } catch (JSONException e) {
                 Log.e(TAG, "Error parsing json", e);
             }
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.button_contacts) {
+
+        } else if (v.getId() == R.id.button_albums) {
+
         }
     }
 }
