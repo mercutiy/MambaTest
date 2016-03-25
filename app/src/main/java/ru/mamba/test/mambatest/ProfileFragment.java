@@ -1,7 +1,7 @@
 package ru.mamba.test.mambatest;
 
-import android.app.Notification;
 import android.content.Context;
+import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -19,9 +19,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import ru.mamba.test.mambatest.fetcher.ApiFetcher;
 import ru.mamba.test.mambatest.fetcher.Request;
 
@@ -30,7 +27,7 @@ import ru.mamba.test.mambatest.fetcher.Request;
  */
 public class ProfileFragment extends Fragment implements View.OnClickListener {
 
-    private static final String TAG = LoginActivityFragment.class.getCanonicalName();
+    private static final String TAG = LoginFragment.class.getCanonicalName();
 
     public ProfileFragment() {
     }
@@ -124,9 +121,11 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 int albums = json.getJSONArray("sysResponsesContainer").getJSONObject(2).getJSONArray("albums").length();
 
 
-                mGreeting.setText(greeting);
+                //mGreeting.setText(greeting);
+                mGreeting.setText("asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf");
 
-                mInterests.setText(interests);
+                //mInterests.setText(interests);
+                mInterests.setText("asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf");
 
                 // TODO age == 0 Скрытый возраст
                 String title = name + " " + String.valueOf(age) + " " + getResources().getString(R.string.string_its_you);
@@ -137,8 +136,8 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                     ab.setTitle(title);
                 }
 
+                // TODO сделать кнопки не скролируемыми
                 mAlbumButton.setText(getResources().getQuantityString(R.plurals.number_of_albums, albums, albums));
-
                 mContactButton.setText(getResources().getQuantityString(R.plurals.number_of_contacts, contacts, contacts));
 
             } catch (JSONException e) {
@@ -152,7 +151,8 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         if (v.getId() == R.id.button_contacts) {
 
         } else if (v.getId() == R.id.button_albums) {
-
+            Intent intent = new Intent(getActivity(), AlbumsActivity.class);
+            getActivity().startActivity(intent);
         }
     }
 }

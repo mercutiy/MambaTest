@@ -21,4 +21,5 @@
         <item quantity="one">%d contact</item>
         <item quantity="other">%d contacts</item>
     </plurals>
+    <string name="title_activity_albums">AlbumsActivity</string>
 </resources>

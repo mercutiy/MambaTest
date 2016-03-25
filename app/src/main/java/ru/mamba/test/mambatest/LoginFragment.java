@@ -2,7 +2,6 @@ package ru.mamba.test.mambatest;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,14 +16,15 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import ru.mamba.test.mambatest.fetcher.ApiFetcher;
+import ru.mamba.test.mambatest.fetcher.FetchException;
 import ru.mamba.test.mambatest.fetcher.Request;
 
 /**
  * A placeholder fragment containing a simple view.
  */
-public class LoginActivityFragment extends Fragment implements View.OnClickListener {
+public class LoginFragment extends Fragment implements View.OnClickListener {
 
-    private static final String TAG = LoginActivityFragment.class.getCanonicalName();
+    private static final String TAG = LoginFragment.class.getCanonicalName();
 
     Button mLoginButton;
 
@@ -32,7 +32,7 @@ public class LoginActivityFragment extends Fragment implements View.OnClickListe
 
     EditText mEditPassword;
 
-    public LoginActivityFragment() {
+    public LoginFragment() {
     }
 
     @Override

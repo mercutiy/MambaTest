@@ -29,6 +29,15 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ru.mamba.test.mambatest.LoginActivity"/>
         </activity>
+        <activity
+            android:name=".AlbumsActivity"
+            android:label="@string/title_activity_albums"
+            android:parentActivityName=".ProfileActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ru.mamba.test.mambatest.ProfileActivity"/>
+        </activity>
     </application>
 
 </manifest>

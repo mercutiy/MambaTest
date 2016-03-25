@@ -40,7 +40,7 @@ public abstract class ApiFetcher extends AsyncTask<Request, Void, JSONObject> {
 
     public SharedPreferences mProperties;
 
-    private FetchException mException;
+    private FetchException mException = new FetchException();
 
     public ApiFetcher(Context context) {
         mContext = context;
