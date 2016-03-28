@@ -8,14 +8,22 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import ru.mamba.test.mambatest.fetcher.ApiFetcher;
 import ru.mamba.test.mambatest.fetcher.Request;
@@ -58,32 +66,112 @@ public class NewAlbumFragment extends Fragment {
                 JSONArray blocks = json.getJSONObject("formBuilder").getJSONArray("blocks");
                 mInflater = getLayoutInflater(new Bundle());
 
-
-
+                for (int i = 0; i < blocks.length(); i++) {
+                    JSONObject block = blocks.getJSONObject(i);
+                    setBlock(block);
+                    JSONArray fields = block.getJSONArray("fields");
+                    for (int j = 0; j < fields.length(); j++) {
+                        JSONObject field = fields.getJSONObject(j);
+                        String type = field.getString("inputType");
+                        if ("Text".equals(type)) {
+                            setText(field);
+                        } else if ("Switcher".equals(type)) {
+                            setSwitcher(field);
+                        } else if ("SingleSelect".equals(type)) {
+                            setSingleSelect(field);
+                        } else {
+                            Log.v(TAG, "Unknown fb type");
+                        }
+                    }
+                }
 
             } catch (JSONException e) {
                 Log.e(TAG, "Error parsing json", e);
             }
-
-            LayoutInflater inflater = getLayoutInflater(new Bundle());
-            View fbText = inflater.inflate(R.layout.fb_text, null);
-            ((TextView)fbText.findViewById(R.id.fb_text_title)).setText("asdfasdf111");
-            mLayout.addView(fbText);
         }
 
-        private void setBlock(String title) {
-            View fbText = mInflater.inflate(R.layout.fb_block, null);
-            ((TextView)fbText.findViewById(R.id.fb_block_title)).setText(title);
-            mLayout.addView(fbText);
+        private void setBlock(JSONObject block) throws JSONException {
+            View fbBlock = mInflater.inflate(R.layout.fb_block, null);
+
+            ((TextView)fbBlock.findViewById(R.id.fb_block_title)).setText(block.getString("name"));
+            if (block.has("error")) {
+                TextView error = (TextView)fbBlock.findViewById(R.id.fb_block_error);
+                error.setText(block.getString("error"));
+                error.setVisibility(View.VISIBLE);
+            }
+            mLayout.addView(fbBlock);
         }
 
-        private void setText(String title, String value) {
+        private void setText(JSONObject text) throws JSONException {
             View fbText = mInflater.inflate(R.layout.fb_text, null);
-            ((TextView)fbText.findViewById(R.id.fb_text_title)).setText(title);
-            ((EditText)fbText.findViewById(R.id.fb_text_edit)).setText(value);
+
+            ((TextView)fbText.findViewById(R.id.fb_text_title)).setText(text.getString("name"));
+            ((EditText)fbText.findViewById(R.id.fb_text_edit)).setText(text.getString("value"));
+            if (text.has("error")) {
+                TextView error = (TextView)fbText.findViewById(R.id.fb_text_error);
+                error.setText(text.getString("error"));
+                error.setVisibility(View.VISIBLE);
+            }
+            // TODO Добавить поддержку desc (описание) во все поля
+
             mLayout.addView(fbText);
         }
 
+        private void setSwitcher(JSONObject switcher) throws JSONException {
+            View fbSwitcher = mInflater.inflate(R.layout.fb_switcher, null);
 
+            Switch switchView = (Switch)fbSwitcher.findViewById(R.id.fb_switcher);
+            switchView.setText(switcher.getString("name"));
+            switchView.setChecked(switcher.getBoolean("value"));
+
+            mLayout.addView(fbSwitcher);
+        }
+
+        private void setSingleSelect(JSONObject singleSelect) throws JSONException {
+            View fbSS = mInflater.inflate(R.layout.fb_single_select, null);
+
+            ((TextView)fbSS.findViewById(R.id.fb_ss_title)).setText(singleSelect.getString("name"));
+            Spinner spinner = (Spinner)fbSS.findViewById(R.id.fb_ss_spinner);
+            List<Item> options = new ArrayList<Item>();
+
+            JSONArray variants = singleSelect.getJSONArray("variants");
+            for (int k = 0; k < variants.length(); k++) {
+                JSONObject variant = variants.getJSONObject(k);
+                options.add(new Item(variant.getString("key"), variant.getString("name")));
+            }
+
+            ArrayAdapter<Item> adapter = new ArrayAdapter<Item>(
+                getActivity().getApplicationContext(),
+                android.R.layout.simple_spinner_item,
+                options
+            );
+            spinner.setAdapter(adapter);
+
+            mLayout.addView(fbSS);
+        }
+    }
+
+    private class Item {
+
+        private String mKey;
+
+        private String mValue;
+
+        public Item(String key, String value) {
+            mKey = key;
+            mValue = value;
+        }
+
+        public String getKey() {
+            return mKey;
+        }
+
+        public String getValue() {
+            return mValue;
+        }
+
+        public String toString() {
+            return getValue();
+        }
     }
 }

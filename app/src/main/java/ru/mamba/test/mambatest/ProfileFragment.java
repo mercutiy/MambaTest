@@ -80,12 +80,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
         @Override
         protected void onPostExecute(JSONObject json) {
-            if (json == null) {
-                Toast.makeText(getActivity(), R.string.notice_wrong_login, Toast.LENGTH_LONG).show();
-                return;
-            }
-            Toast.makeText(getActivity(), R.string.notice_right_login, Toast.LENGTH_LONG).show();
-
             try {
                 JSONObject anketa = json.getJSONArray("sysResponsesContainer").getJSONObject(0).getJSONObject("anketa");
 
