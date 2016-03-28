@@ -5,14 +5,23 @@ import android.graphics.Bitmap;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -26,11 +35,13 @@ import ru.mamba.test.mambatest.model.Album;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class AlbumsFragment extends Fragment {
+public class AlbumsFragment extends Fragment implements AdapterView.OnItemClickListener {
 
     private AlbumAdapter mAlbumAdapter;
 
     private PhotoFetcher<ImageView> mPhotoFetcher;
+
+    private MenuItem mMenuAdd;
 
     public AlbumsFragment() {
     }
@@ -39,11 +50,10 @@ public class AlbumsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //updateMovies();
         mPhotoFetcher = new PhotoFetcher<ImageView>(new Handler());
         mPhotoFetcher.setListener(new PhotoFetcher.Listener<ImageView>() {
                  @Override
-                 public void onThumbnailDownloaded(ImageView imageView, Bitmap bitmap) {
+                 public void onPhotoDownloaded(ImageView imageView, Bitmap bitmap) {
                      if (isVisible()) {
                          imageView.setImageBitmap(bitmap);
                      }
@@ -71,8 +81,13 @@ public class AlbumsFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_albums, container, false);
 
+        mAlbumAdapter = new AlbumAdapter(new ArrayList<Album>());
+
         ListView listView = (ListView)view.findViewById(R.id.list_view_albums);
         listView.setAdapter(mAlbumAdapter);
+        listView.setOnItemClickListener(this);
+
+        new AlbumFetcher(getActivity()).execute();
 
         return view;
     }
@@ -104,6 +119,8 @@ public class AlbumsFragment extends Fragment {
 
     private class AlbumFetcher extends ApiFetcher {
 
+        private String TAG = AlbumFetcher.class.getCanonicalName();
+
         public AlbumFetcher(Context context) {
             super(context);
             HashMap<String, String> params = new HashMap<String, String>();
@@ -114,8 +131,34 @@ public class AlbumsFragment extends Fragment {
 
         @Override
         protected void onPostExecute(JSONObject json) {
+            try {
+                JSONArray albumsJson = json.getJSONArray("albums");
+                int albumsCount = albumsJson.length();
+                for (int i = 0; i < albumsCount; i++) {
+                    JSONObject albumJson = albumsJson.getJSONObject(i);
+                    Album album = new Album(
+                        albumJson.getInt("id"),
+                        albumJson.getString("name"),
+                        albumJson.getString("coverUrl")
+                    );
+                    mAlbumAdapter.add(album);
+                }
 
+                ActionBar ab = ((AppCompatActivity)getActivity()).getSupportActionBar();
+                //ActionBar ab =  getActivity().getActionBar();
+                if (ab != null) {
+                    ab.setTitle(getResources().getQuantityString(R.plurals.number_of_albums, albumsCount, albumsCount));
+                }
+
+
+            } catch (JSONException e) {
+                Log.e(TAG, "Error parsing json", e);
+            }
         }
     }
 
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Album album = (Album)mAlbumAdapter.getItem(position);
+    }
 }

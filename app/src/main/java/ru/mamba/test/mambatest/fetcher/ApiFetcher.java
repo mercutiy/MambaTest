@@ -32,7 +32,7 @@ public abstract class ApiFetcher extends AsyncTask<Request, Void, JSONObject> {
 
     public static final String PREF_FIELD_SECRET = "SECRET";
 
-    private final String mBaseUrl = "http://api.mobile-api.ru.www19.lan/v5.2.20.0/";
+    private final String mBaseUrl = "http://api.mobile-api.ru/v5.2.20.0/";
 
     protected Request mRequest;
 

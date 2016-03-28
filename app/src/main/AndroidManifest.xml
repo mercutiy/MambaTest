@@ -38,6 +38,29 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ru.mamba.test.mambatest.ProfileActivity"/>
         </activity>
+        <activity
+            android:name=".ContactsActivity"
+            android:label="@string/title_activity_main"
+            android:parentActivityName=".ProfileActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ru.mamba.test.mambatest.ProfileActivity"/>
+        </activity>
+        <activity
+            android:name=".AnketaActivity"
+            android:label="@string/title_activity_anketa"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity
+            android:name=".NewAlbumActivity"
+            android:label="@string/title_activity_new_album"
+            android:parentActivityName=".AlbumsActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ru.mamba.test.mambatest.AlbumsActivity"/>
+        </activity>
     </application>
 
 </manifest>

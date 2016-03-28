@@ -26,7 +26,7 @@ public class PhotoFetcher<Token> extends HandlerThread {
     Listener<Token> mListener;
 
     public interface Listener<Token> {
-        void onThumbnailDownloaded(Token token, Bitmap bitmap);
+        void onPhotoDownloaded(Token token, Bitmap bitmap);
     }
 
     public void setListener(Listener<Token> listener) {
@@ -79,7 +79,7 @@ public class PhotoFetcher<Token> extends HandlerThread {
                         }
 
                         requestMap.remove(token);
-                        mListener.onThumbnailDownloaded(token, bitmap);
+                        mListener.onPhotoDownloaded(token, bitmap);
                     }
                 }
             );

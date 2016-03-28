@@ -21,5 +21,14 @@
         <item quantity="one">%d contact</item>
         <item quantity="other">%d contacts</item>
     </plurals>
+
+    <plurals name="number_of_messages">
+        <item quantity="one">%d message</item>
+        <item quantity="other">%d messages</item>
+    </plurals>
+
     <string name="title_activity_albums">AlbumsActivity</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_anketa">AnketaActivity</string>
+    <string name="title_activity_new_album">NewAlbumActivity</string>
 </resources>

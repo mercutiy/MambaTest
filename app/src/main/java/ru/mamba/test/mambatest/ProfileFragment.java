@@ -149,6 +149,8 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.button_contacts) {
+            Intent intent = new Intent(getActivity(), ContactsActivity.class);
+            getActivity().startActivity(intent);
 
         } else if (v.getId() == R.id.button_albums) {
             Intent intent = new Intent(getActivity(), AlbumsActivity.class);
