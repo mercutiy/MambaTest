@@ -145,11 +145,9 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 int albums = json.getJSONArray("sysResponsesContainer").getJSONObject(2).getJSONArray("albums").length();
 
 
-                //mGreeting.setText(greeting);
-                mGreeting.setText("asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf");
+                mGreeting.setText(greeting);
 
-                //mInterests.setText(interests);
-                mInterests.setText("asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf asdfasdf");
+                mInterests.setText(interests);
 
                 // TODO age == 0 Скрытый возраст
                 String title = name + " " + String.valueOf(age) + " " + getResources().getString(R.string.string_its_you);

@@ -145,7 +145,6 @@ public class AlbumsFragment extends Fragment implements AdapterView.OnItemClickL
                 }
 
                 ActionBar ab = ((AppCompatActivity)getActivity()).getSupportActionBar();
-                //ActionBar ab =  getActivity().getActionBar();
                 if (ab != null) {
                     ab.setTitle(getResources().getQuantityString(R.plurals.number_of_albums, albumsCount, albumsCount));
                 }
