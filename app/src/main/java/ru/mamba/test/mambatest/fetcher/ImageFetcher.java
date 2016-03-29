@@ -1,5 +1,8 @@
 package ru.mamba.test.mambatest.fetcher;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,7 +11,7 @@ import java.net.URL;
 
 public class ImageFetcher {
 
-    public byte[] fetchImage(String specUrl) throws IOException {
+    public Bitmap fetchImage(String specUrl) throws IOException {
         URL url = new URL(specUrl);
         HttpURLConnection connection = (HttpURLConnection)url.openConnection();
 
@@ -27,7 +30,9 @@ public class ImageFetcher {
             }
             outputStream.close();
 
-            return outputStream.toByteArray();
+            byte[] bytes = outputStream.toByteArray();
+
+            return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
         } finally {
             connection.disconnect();
         }

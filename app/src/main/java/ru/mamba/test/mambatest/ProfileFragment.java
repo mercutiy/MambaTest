@@ -2,6 +2,7 @@ package ru.mamba.test.mambatest;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -19,7 +20,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+
 import ru.mamba.test.mambatest.fetcher.ApiFetcher;
+import ru.mamba.test.mambatest.fetcher.FetchException;
+import ru.mamba.test.mambatest.fetcher.ImageFetcher;
 import ru.mamba.test.mambatest.fetcher.Request;
 
 /**
@@ -56,15 +61,19 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         mAlbumButton.setOnClickListener(this);
         mContactButton.setOnClickListener(this);
 
-        new LoginFetcher(getActivity()).execute();
+        new ProfileFetcher(getActivity()).execute();
 
         return view;
     }
 
 
-    private class LoginFetcher extends ApiFetcher {
+    private class ProfileFetcher extends ApiFetcher {
 
-        public LoginFetcher(Context context) {
+        private JSONObject mAnketa;
+
+        private Bitmap mImage;
+
+        public ProfileFetcher(Context context) {
             super(context);
             JSONObject multiReq;
             try {
@@ -79,6 +88,29 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         }
 
         @Override
+        protected JSONObject getResponse(Request request) throws FetchException {
+            JSONObject response = super.getResponse(request);
+            if (response == null) {
+                return response;
+            }
+
+            try {
+                JSONObject mAnketa = response.getJSONArray("sysResponsesContainer").getJSONObject(0).getJSONObject("anketa");
+                String photoSrc = mAnketa.getString("squarePhotoUrl");
+                mImage = new ImageFetcher().fetchImage(photoSrc);
+            } catch (JSONException e) {
+                Log.e(TAG, "Error parsing json", e);
+                throw new FetchException();
+            }
+            catch (IOException e) {
+                Log.e(TAG, "IO error", e);
+                throw new FetchException();
+            }
+
+            return response;
+        }
+
+        @Override
         protected void onPostExecute(JSONObject json) {
             try {
                 JSONObject anketa = json.getJSONArray("sysResponsesContainer").getJSONObject(0).getJSONObject("anketa");
@@ -86,8 +118,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 String name = anketa.getString("name");
 
                 int age = anketa.getInt("age");
-
-                String photoSrc = anketa.getString("squarePhotoUrl");
 
                 String greeting = "";
                 JSONArray aboutme =
@@ -125,10 +155,11 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 String title = name + " " + String.valueOf(age) + " " + getResources().getString(R.string.string_its_you);
 
                 ActionBar ab = ((AppCompatActivity)getActivity()).getSupportActionBar();
-                //ActionBar ab =  getActivity().getActionBar();
                 if (ab != null) {
                     ab.setTitle(title);
                 }
+
+                mPhoto.setImageBitmap(mImage);
 
                 // TODO сделать кнопки не скролируемыми
                 mAlbumButton.setText(getResources().getQuantityString(R.plurals.number_of_albums, albums, albums));
@@ -137,6 +168,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             } catch (JSONException e) {
                 Log.e(TAG, "Error parsing json", e);
             }
+
         }
     }
 

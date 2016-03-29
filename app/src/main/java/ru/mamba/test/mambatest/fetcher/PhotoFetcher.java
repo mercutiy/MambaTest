@@ -67,8 +67,7 @@ public class PhotoFetcher<Token> extends HandlerThread {
                 return;
             }
 
-            byte[] bitmapBytes = new ImageFetcher().fetchImage(url);
-            final Bitmap bitmap = BitmapFactory.decodeByteArray(bitmapBytes, 0, bitmapBytes.length);
+            final Bitmap bitmap = new ImageFetcher().fetchImage(url);
 
             mResponseHandler.post(
                 new Runnable() {

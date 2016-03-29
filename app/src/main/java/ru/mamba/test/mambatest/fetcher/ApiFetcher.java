@@ -70,7 +70,7 @@ public abstract class ApiFetcher extends AsyncTask<Request, Void, JSONObject> {
 
     }
 
-    private JSONObject getResponse(Request request) throws FetchException {
+    protected JSONObject getResponse(Request request) throws FetchException {
         HttpURLConnection connection = null;
         BufferedReader reader = null;
         BufferedWriter writer = null;
