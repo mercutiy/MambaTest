@@ -18,14 +18,13 @@ public class AnketaActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        int anketaId = getIntent().getIntExtra(EXTRA_ANKETA_ID, 0);
+        AnketaFragment fragment = AnketaFragment.newInstance(anketaId);
+
+        getSupportFragmentManager()
+            .beginTransaction()
+            .add(R.id.fragment_anketa, fragment)
+            .commit();
     }
 
 }
