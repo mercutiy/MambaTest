@@ -33,6 +33,7 @@ import ru.mamba.test.mambatest.fetcher.ApiFetcher2;
 import ru.mamba.test.mambatest.fetcher.PhotoFetcher;
 import ru.mamba.test.mambatest.fetcher.Request;
 import ru.mamba.test.mambatest.fetcher.Response;
+import ru.mamba.test.mambatest.fetcher.Session;
 import ru.mamba.test.mambatest.model.Album;
 
 /**
@@ -128,7 +129,8 @@ public class AlbumsFragment extends Fragment implements AdapterView.OnItemClickL
             HashMap<String, String> params = new HashMap<String, String>();
             params.put("photos", "true");
             params.put("limit", "1");
-            setRequest(new Request("/users/634593392/albums/", Request.GET, params));
+            int anketaId = new Session(activity).getAnketaId();
+            setRequest(new Request("/users/" + String.valueOf(anketaId) + "/albums/", Request.GET, params));
         }
 
 
