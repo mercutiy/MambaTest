@@ -22,8 +22,6 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <!--include layout="@layout/content_anketa"/-->
-
     <FrameLayout
         android:id="@+id/fragment_anketa"
         android:layout_width="match_parent"

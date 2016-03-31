@@ -160,7 +160,7 @@ public abstract class ApiFetcher2 extends AsyncTask<Request, Void, Response> {
     }
 
     protected void onPreExecute() {
-        mDialog = new ProgressDialog(mActivity);
+        mDialog = new ProgressDialog(getActivity());
         mDialog.setMessage(mActivity.getResources().getString(R.string.loading));
         mDialog.setIndeterminate(true);
         mDialog.setCancelable(true);
