@@ -1,5 +1,6 @@
 package ru.mamba.test.mambatest;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -21,9 +22,12 @@ import org.json.JSONObject;
 import java.io.IOException;
 
 import ru.mamba.test.mambatest.fetcher.ApiFetcher;
+import ru.mamba.test.mambatest.fetcher.ApiFetcher2;
 import ru.mamba.test.mambatest.fetcher.FetchException;
 import ru.mamba.test.mambatest.fetcher.ImageFetcher;
+import ru.mamba.test.mambatest.fetcher.ImageResponse;
 import ru.mamba.test.mambatest.fetcher.Request;
+import ru.mamba.test.mambatest.fetcher.Response;
 
 public class AnketaFragment extends Fragment {
 
@@ -72,54 +76,52 @@ public class AnketaFragment extends Fragment {
     }
 
 
-    private class AnketaFetcher extends ApiFetcher {
+    private class AnketaFetcher extends ApiFetcher2 {
 
-        private final String TAG = AnketaFetcher.class.getCanonicalName();
 
-        private JSONObject mAnketa;
-
-        private Bitmap mImage;
-
-        public AnketaFetcher(Context context, int anketaId) {
-            super(context);
-            mRequest = new Request("/users/" + String.valueOf(anketaId) + "/");
+        public AnketaFetcher(Activity activity, int anketaId) {
+            super(activity);
+            setRequest(new Request("/users/" + String.valueOf(anketaId) + "/"));
         }
 
         @Override
-        protected JSONObject getResponse(Request request) throws FetchException {
-            JSONObject response = super.getResponse(request);
-            if (response == null) {
-                return response;
-            }
+        protected Response getResponse(Request request) throws FetchException {
+            Response response = super.getResponse(request);
 
             try {
-                mAnketa = response.getJSONObject("anketa");
-                String photoSrc = mAnketa.getString("squarePhotoUrl");
-                mImage = new ImageFetcher().fetchImage(photoSrc);
+                String photoSrc = response
+                        .getJson()
+                        .getJSONObject("anketa")
+                        .getString("squarePhotoUrl");
+                Bitmap photo = new ImageFetcher().fetchImage(photoSrc);
 
-                return response;
+                ImageResponse imageResponse = new ImageResponse(response.getJson(), photo);
+                imageResponse.setPhoto(photo);
+
+                return imageResponse;
+
             } catch (JSONException e) {
                 Log.e(TAG, "Error parsing json", e);
                 throw new FetchException();
-            } catch (IOException e) {
+            }
+            catch (IOException e) {
                 Log.e(TAG, "IO error", e);
                 throw new FetchException();
             }
-
-
         }
 
         @Override
-        protected void onPostExecute(JSONObject json) {
+        protected void uiExecute(Response response) throws JSONException {
             try {
+                JSONObject anketa = response.getJson().getJSONObject("anketa");
 
-                String name = mAnketa.getString("name");
+                String name = anketa.getString("name");
 
-                int age = mAnketa.getInt("age");
+                int age = anketa.getInt("age");
 
                 String greeting = "";
-                if (mAnketa.has("aboutmeBlock") && !mAnketa.isNull("aboutmeBlock")) {
-                    JSONObject aboutMeBlock = mAnketa.getJSONObject("aboutmeBlock");
+                if (anketa.has("aboutmeBlock") && !anketa.isNull("aboutmeBlock")) {
+                    JSONObject aboutMeBlock = anketa.getJSONObject("aboutmeBlock");
                     JSONArray aboutMe = aboutMeBlock.getJSONArray("fields");
                     for (int i = 0; i < aboutMe.length(); i++) {
                         JSONObject aboutmeItem = aboutMe.getJSONObject(i);
@@ -132,7 +134,7 @@ public class AnketaFragment extends Fragment {
 
 
                 String interests = "";
-                JSONArray jsonInterests = mAnketa.getJSONObject("interests").getJSONArray("items");
+                JSONArray jsonInterests = anketa.getJSONObject("interests").getJSONArray("items");
                 for (int i = 0; i < jsonInterests.length(); i++) {
                     interests = interests + jsonInterests.getJSONObject(i).getString("title") + " ";
                 }
@@ -141,7 +143,8 @@ public class AnketaFragment extends Fragment {
 
                 mInterests.setText(interests);
 
-                mPhoto.setImageBitmap(mImage);
+                ImageResponse imageResponse = (ImageResponse)response;
+                mPhoto.setImageBitmap(imageResponse.getPhoto());
 
                 ActionBar ab = ((AppCompatActivity)getActivity()).getSupportActionBar();
                 if (ab != null) {

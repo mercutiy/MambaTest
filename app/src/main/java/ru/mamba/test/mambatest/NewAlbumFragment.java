@@ -1,5 +1,6 @@
 package ru.mamba.test.mambatest;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.Fragment;
@@ -29,7 +30,9 @@ import java.util.List;
 import java.util.Map;
 
 import ru.mamba.test.mambatest.fetcher.ApiFetcher;
+import ru.mamba.test.mambatest.fetcher.ApiFetcher2;
 import ru.mamba.test.mambatest.fetcher.Request;
+import ru.mamba.test.mambatest.fetcher.Response;
 
 public class NewAlbumFragment extends Fragment {
 
@@ -76,56 +79,52 @@ public class NewAlbumFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
-    private class FormFetcher extends ApiFetcher {
-
-        private String TAG = FormFetcher.class.getCanonicalName();
+    private class FormFetcher extends ApiFetcher2 {
 
         private LayoutInflater mInflater;
 
         private Map<String, View[]> mFormMap = new HashMap<String, View[]>();
 
-        public FormFetcher(Context context) {
-            super(context);
-            mRequest = new Request("/albums/new/");
+
+        public FormFetcher(Activity activity) {
+            super(activity);
+            setRequest(new Request("/albums/new/"));
         }
 
         @Override
-        protected void onPostExecute(JSONObject json) {
-            try {
+        protected void uiExecute(Response response) throws JSONException {
 
-                if (json.has("message")) {
-                    String message = json.getString("message");
-                    success(message);
-                    return;
-                }
+            JSONObject json = response.getJson();
 
-                JSONArray blocks = json.getJSONObject("formBuilder").getJSONArray("blocks");
-                mInflater = getLayoutInflater(new Bundle());
+            if (json.has("message")) {
+                String message = json.getString("message");
+                success(message);
+                return;
+            }
 
-                for (int i = 0; i < blocks.length(); i++) {
-                    JSONObject block = blocks.getJSONObject(i);
-                    addBlock(block);
-                    JSONArray fields = block.getJSONArray("fields");
-                    List<View> blockFields = new ArrayList<View>();
-                    for (int j = 0; j < fields.length(); j++) {
-                        JSONObject field = fields.getJSONObject(j);
-                        String type = field.getString("inputType");
-                        if ("Text".equals(type)) {
-                            blockFields.add(addText(field));
-                        } else if ("Switcher".equals(type)) {
-                            blockFields.add(addSwitcher(field));
-                        } else if ("SingleSelect".equals(type)) {
-                            blockFields.add(addSingleSelect(field));
-                        } else {
-                            Log.v(TAG, "Unknown fb type");
-                        }
+            JSONArray blocks = json.getJSONObject("formBuilder").getJSONArray("blocks");
+            mInflater = getLayoutInflater(new Bundle());
+
+            for (int i = 0; i < blocks.length(); i++) {
+                JSONObject block = blocks.getJSONObject(i);
+                addBlock(block);
+                JSONArray fields = block.getJSONArray("fields");
+                List<View> blockFields = new ArrayList<View>();
+                for (int j = 0; j < fields.length(); j++) {
+                    JSONObject field = fields.getJSONObject(j);
+                    String type = field.getString("inputType");
+                    if ("Text".equals(type)) {
+                        blockFields.add(addText(field));
+                    } else if ("Switcher".equals(type)) {
+                        blockFields.add(addSwitcher(field));
+                    } else if ("SingleSelect".equals(type)) {
+                        blockFields.add(addSingleSelect(field));
+                    } else {
+                        Log.v(TAG, "Unknown fb type");
                     }
-
-                    mFormMap.put(block.getString("field"), blockFields.toArray(new View[blockFields.size()]));
                 }
 
-            } catch (JSONException e) {
-                Log.e(TAG, "Error parsing json", e);
+                mFormMap.put(block.getString("field"), blockFields.toArray(new View[blockFields.size()]));
             }
         }
 

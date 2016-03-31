@@ -1,5 +1,6 @@
 package ru.mamba.test.mambatest;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -29,8 +30,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import ru.mamba.test.mambatest.fetcher.ApiFetcher;
+import ru.mamba.test.mambatest.fetcher.ApiFetcher2;
 import ru.mamba.test.mambatest.fetcher.PhotoFetcher;
 import ru.mamba.test.mambatest.fetcher.Request;
+import ru.mamba.test.mambatest.fetcher.Response;
 import ru.mamba.test.mambatest.model.Album;
 import ru.mamba.test.mambatest.model.Contact;
 
@@ -121,57 +124,50 @@ public class ContactsFragment extends Fragment implements AdapterView.OnItemClic
         }
     }
 
-    private class ContactFetcher extends ApiFetcher {
+    private class ContactFetcher extends ApiFetcher2 {
 
-        private String TAG = ContactFetcher.class.getCanonicalName();
-
-        public ContactFetcher(Context context) {
-            super(context);
+        public ContactFetcher(Activity activity) {
+            super(activity);
             HashMap<String, String> params = new HashMap<String, String>();
             params.put("limit", "10");
-            mRequest = new Request("/folders/390353/contacts/", Request.GET, params);
+            setRequest(new Request("/folders/390353/contacts/", Request.GET, params));
         }
 
         @Override
-        protected void onPostExecute(JSONObject json) {
-            try {
-                int contactsCount = json.getJSONObject("folder").getInt("count");
+        protected void uiExecute(Response response) throws JSONException {
 
-                JSONArray contactsJson = json.getJSONArray("contacts");
+            JSONObject json = response.getJson();
 
-                for (int i = 0; i < contactsJson.length(); i++) {
-                    JSONObject contactJson = contactsJson.getJSONObject(i);
-                    JSONObject anketaJson = contactJson.getJSONObject("anketa");
-                    Contact contact = new Contact(
-                        contactJson.getInt("contactId"),
-                        anketaJson.getInt("id"),
-                        anketaJson.getString("name"),
-                        contactJson.getInt("messages")
-                    );
+            int contactsCount = json.getJSONObject("folder").getInt("count");
 
-                    try {
-                        contact.setDeleted(anketaJson.getBoolean("deleted"));
-                    } catch (JSONException e) {
-                        contact.setDeleted(false);
-                    }
+            JSONArray contactsJson = json.getJSONArray("contacts");
 
-                    if (!contact.isDeleted()) {
-                        contact.setAge(anketaJson.getInt("age"));
-                        contact.setPhoto(anketaJson.getString("squarePhotoUrl"));
-                    }
-                    // TODO Сделать поддержку удаленной анкеты
+            for (int i = 0; i < contactsJson.length(); i++) {
+                JSONObject contactJson = contactsJson.getJSONObject(i);
+                JSONObject anketaJson = contactJson.getJSONObject("anketa");
+                Contact contact = new Contact(
+                    contactJson.getInt("contactId"),
+                    anketaJson.getInt("id"),
+                    anketaJson.getString("name"),
+                    contactJson.getInt("messages")
+                );
 
-                    mContactAdapter.add(contact);
+                if (anketaJson.has("deleted")) {
+                    contact.setDeleted(anketaJson.getBoolean("deleted"));
                 }
 
-                ActionBar ab = ((AppCompatActivity)getActivity()).getSupportActionBar();
-                if (ab != null) {
-                    ab.setTitle(getResources().getQuantityString(R.plurals.number_of_contacts, contactsCount, contactsCount));
+                if (!contact.isDeleted()) {
+                    contact.setAge(anketaJson.getInt("age"));
+                    contact.setPhoto(anketaJson.getString("squarePhotoUrl"));
                 }
+                // TODO Сделать поддержку удаленной анкеты
 
+                mContactAdapter.add(contact);
+            }
 
-            } catch (JSONException e) {
-                Log.e(TAG, "Error parsing json", e);
+            ActionBar ab = ((AppCompatActivity)getActivity()).getSupportActionBar();
+            if (ab != null) {
+                ab.setTitle(getResources().getQuantityString(R.plurals.number_of_contacts, contactsCount, contactsCount));
             }
         }
     }

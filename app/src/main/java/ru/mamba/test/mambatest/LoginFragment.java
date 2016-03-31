@@ -1,5 +1,6 @@
 package ru.mamba.test.mambatest;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.Fragment;
@@ -16,8 +17,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import ru.mamba.test.mambatest.fetcher.ApiFetcher;
+import ru.mamba.test.mambatest.fetcher.ApiFetcher2;
 import ru.mamba.test.mambatest.fetcher.FetchException;
 import ru.mamba.test.mambatest.fetcher.Request;
+import ru.mamba.test.mambatest.fetcher.Response;
+import ru.mamba.test.mambatest.fetcher.Session;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -57,7 +61,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                 jsonRequest.put("login", mEditLogin.getText().toString());
                 jsonRequest.put("password", mEditPassword.getText().toString());
             } catch (JSONException e) {
-                Log.e(TAG, "JSON creating error", e);
+                Log.e(TAG, "json creating error", e);
                 return;
             }
             Request request = new Request(
@@ -71,28 +75,25 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-    private class LoginFetcher extends ApiFetcher {
+    private class LoginFetcher extends ApiFetcher2 {
 
-        public LoginFetcher(Context context) {
-            super(context);
+        public LoginFetcher(Activity activity) {
+            super(activity);
         }
 
         @Override
-        protected void onPostExecute(JSONObject json) {
-            if (json == null) {
+        protected void uiExecute(Response response) throws JSONException {
+            JSONObject json = response.getJson();
+            if (json.getBoolean("isAuth")) {
+                Toast.makeText(getActivity(), R.string.notice_right_login, Toast.LENGTH_LONG).show();
+            } else {
                 Toast.makeText(getActivity(), R.string.notice_wrong_login, Toast.LENGTH_LONG).show();
                 return;
             }
-            Toast.makeText(getActivity(), R.string.notice_right_login, Toast.LENGTH_LONG).show();
 
-            try {
-                mProperties
-                    .edit()
-                    .putString(PREF_FIELD_SECRET, json.getString("authSecret"))
-                    .apply();
-            } catch (JSONException e) {
-                Log.e(TAG, "Error parsing json", e);
-            }
+            Session session = new Session(getActivity());
+            session.setSecret(json.getString("authSecret"));
+            session.setAnketaId(json.getJSONObject("profile").getInt("id"));
 
             Intent intent = new Intent(getActivity(), ProfileActivity.class);
             getActivity().startActivity(intent);
