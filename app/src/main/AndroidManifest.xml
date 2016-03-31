@@ -50,7 +50,11 @@
         <activity
             android:name=".AnketaActivity"
             android:label="@string/title_activity_anketa"
+            android:parentActivityName=".ContactsActivity"
             android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ru.mamba.test.mambatest.ContactsActivity"/>
         </activity>
         <activity
             android:name=".NewAlbumActivity"

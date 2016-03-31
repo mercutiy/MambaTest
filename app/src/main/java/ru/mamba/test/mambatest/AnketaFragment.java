@@ -5,6 +5,8 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,14 +25,6 @@ import ru.mamba.test.mambatest.fetcher.FetchException;
 import ru.mamba.test.mambatest.fetcher.ImageFetcher;
 import ru.mamba.test.mambatest.fetcher.Request;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link AnketaFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link AnketaFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class AnketaFragment extends Fragment {
 
 
@@ -72,6 +66,8 @@ public class AnketaFragment extends Fragment {
         mInterests = (TextView)view.findViewById(R.id.text_view_anketa_interests);
         mPhoto = (ImageView)view.findViewById(R.id.image_view_anketa_photo);
 
+        new AnketaFetcher(getActivity(), mAnketaId).execute();
+
         return view;
     }
 
@@ -97,9 +93,11 @@ public class AnketaFragment extends Fragment {
             }
 
             try {
-                JSONObject mAnketa = response.getJSONObject("anketa");
+                mAnketa = response.getJSONObject("anketa");
                 String photoSrc = mAnketa.getString("squarePhotoUrl");
                 mImage = new ImageFetcher().fetchImage(photoSrc);
+
+                return response;
             } catch (JSONException e) {
                 Log.e(TAG, "Error parsing json", e);
                 throw new FetchException();
@@ -108,7 +106,7 @@ public class AnketaFragment extends Fragment {
                 throw new FetchException();
             }
 
-            return response;
+
         }
 
         @Override
@@ -120,21 +118,36 @@ public class AnketaFragment extends Fragment {
                 int age = mAnketa.getInt("age");
 
                 String greeting = "";
-                JSONArray aboutme = mAnketa.getJSONObject("aboutmeBlock").getJSONArray("fields");
-                JSONObject aboutmeItem;
-                for (int i = 0; i < aboutme.length(); i++) {
-                    aboutmeItem = aboutme.getJSONObject(i);
-                    if (aboutmeItem.getString("key").equals("aboutme")) {
-                        greeting = aboutmeItem.getString("value");
-                        break;
+                if (mAnketa.has("aboutmeBlock") && !mAnketa.isNull("aboutmeBlock")) {
+                    JSONObject aboutMeBlock = mAnketa.getJSONObject("aboutmeBlock");
+                    JSONArray aboutMe = aboutMeBlock.getJSONArray("fields");
+                    for (int i = 0; i < aboutMe.length(); i++) {
+                        JSONObject aboutmeItem = aboutMe.getJSONObject(i);
+                        if (aboutmeItem.getString("key").equals("aboutme")) {
+                            greeting = aboutmeItem.getString("value");
+                            break;
+                        }
                     }
                 }
+
 
                 String interests = "";
                 JSONArray jsonInterests = mAnketa.getJSONObject("interests").getJSONArray("items");
                 for (int i = 0; i < jsonInterests.length(); i++) {
                     interests = interests + jsonInterests.getJSONObject(i).getString("title") + " ";
                 }
+
+                mGreeting.setText(greeting);
+
+                mInterests.setText(interests);
+
+                mPhoto.setImageBitmap(mImage);
+
+                ActionBar ab = ((AppCompatActivity)getActivity()).getSupportActionBar();
+                if (ab != null) {
+                    ab.setTitle(name + " " + String.valueOf(age));
+                }
+
             } catch (JSONException e) {
                 Log.e(TAG, "Error parsing json", e);
             }

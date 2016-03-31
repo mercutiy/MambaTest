@@ -159,7 +159,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
                 mPhoto.setImageBitmap(mImage);
 
-                // TODO сделать кнопки не скролируемыми
                 mAlbumButton.setText(getResources().getQuantityString(R.plurals.number_of_albums, albums, albums));
                 mContactButton.setText(getResources().getQuantityString(R.plurals.number_of_contacts, contacts, contacts));
 
