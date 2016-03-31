@@ -78,7 +78,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             super(activity);
             int anketaId = new Session(activity).getAnketaId();
             try {
-                JSONObject request = new JSONObject("{\"sysRequestsContainer\":[{\"method\":\"GET\", \"uri\":\"/profile/\", \"params\":{}}, {\"method\": \"GET\", \"uri\":\"/contacts/all/\", \"params\":{\"limit\": 1}}, {\"method\":\"GET\", \"uri\":\"/users/" + String.valueOf(anketaId) + "/albums/\", \"params\":{}}]}");
+                JSONObject request = new JSONObject("{\"sysRequestsContainer\":[{\"method\":\"GET\", \"uri\":\"/profile/\", \"params\":{}}, {\"method\":\"GET\", \"uri\":\"/folders/\", \"params\":{}}, {\"method\":\"GET\", \"uri\":\"/users/" + String.valueOf(anketaId) + "/albums/\", \"params\":{}}]}");
                 setRequest(new Request("", Request.POST, null, request));
             } catch (JSONException e) {
                 Log.e(TAG, "json creating error", e);
@@ -119,9 +119,9 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         protected void uiExecute(Response response) throws JSONException {
             ImageResponse imageResponse = (ImageResponse)response;
 
-            JSONObject json = imageResponse.getJson();
+            JSONArray container = imageResponse.getJson().getJSONArray("sysResponsesContainer");
 
-            JSONObject anketa = json.getJSONArray("sysResponsesContainer").getJSONObject(0).getJSONObject("anketa");
+            JSONObject anketa = container.getJSONObject(0).getJSONObject("anketa");
 
             String name = anketa.getString("name");
 
@@ -150,8 +150,10 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             mInterests.setText(interests);
             mPhoto.setImageBitmap(imageResponse.getPhoto());
 
-            int contacts = json.getJSONArray("sysResponsesContainer").getJSONObject(1).getInt("count");
-            int albums = json.getJSONArray("sysResponsesContainer").getJSONObject(2).getJSONArray("albums").length();
+            JSONObject folder = container.getJSONObject(1).getJSONArray("folders").getJSONObject(0);
+
+            int contacts = folder.getInt("count");
+            int albums = container.getJSONObject(2).getJSONArray("albums").length();
 
             mAlbumButton.setText(getResources().getQuantityString(R.plurals.number_of_albums, albums, albums));
             mContactButton.setText(getResources().getQuantityString(R.plurals.number_of_contacts, contacts, contacts));
@@ -161,6 +163,8 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 String title = name + " " + String.valueOf(age) + " " + getResources().getString(R.string.string_its_you);
                 ab.setTitle(title);
             }
+
+            new Session(getActivity()).setFolderId(folder.getInt("id"));
         }
     }
 

@@ -18,6 +18,8 @@ public class Session {
 
     public static final String PREF_FIELD_ANKETA = "ANKETA";
 
+    public static final String PREF_FIELD_FOLDER = "FOLDER";
+
     private SharedPreferences mPreferences;
 
     private String mSid = null;
@@ -81,4 +83,13 @@ public class Session {
             mAnketaId = anketaId;
         }
     }
+
+    public void setFolderId(int folderId) {
+        mPreferences.edit().putInt(PREF_FIELD_FOLDER, folderId).apply();
+    }
+
+    public int getFolderId() {
+        return mPreferences.getInt(PREF_FIELD_FOLDER, 0);
+    }
+
 }
