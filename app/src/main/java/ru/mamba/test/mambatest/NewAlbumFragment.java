@@ -161,7 +161,10 @@ public class NewAlbumFragment extends Fragment {
 
         private void success(String message) {
             Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
-            getActivity().finish();
+            //getActivity().finish();
+            Intent intent = new Intent(getActivity(), AlbumsActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
         }
 
         private void addBlock(JSONObject block) throws JSONException {

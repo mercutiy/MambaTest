@@ -34,6 +34,7 @@ import ru.mamba.test.mambatest.fetcher.ApiFetcher2;
 import ru.mamba.test.mambatest.fetcher.PhotoFetcher;
 import ru.mamba.test.mambatest.fetcher.Request;
 import ru.mamba.test.mambatest.fetcher.Response;
+import ru.mamba.test.mambatest.fetcher.Session;
 import ru.mamba.test.mambatest.model.Album;
 import ru.mamba.test.mambatest.model.Contact;
 
@@ -130,7 +131,8 @@ public class ContactsFragment extends Fragment implements AdapterView.OnItemClic
             super(activity);
             HashMap<String, String> params = new HashMap<String, String>();
             params.put("limit", "10");
-            setRequest(new Request("/folders/390353/contacts/", Request.GET, params));
+            int folderId = new Session(activity).getFolderId();
+            setRequest(new Request("/folders/" + String.valueOf(folderId) + "/contacts/", Request.GET, params));
         }
 
         @Override
