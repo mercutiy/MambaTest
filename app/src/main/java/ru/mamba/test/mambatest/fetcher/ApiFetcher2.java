@@ -1,7 +1,10 @@
 package ru.mamba.test.mambatest.fetcher;
 
+import android.animation.FloatEvaluator;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -99,13 +102,13 @@ public abstract class ApiFetcher2 extends AsyncTask<Request, Void, Response> {
             connection.connect();
 
             if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
-                throw new FetchException();
+                throw new ConnectionException();
             }
 
             InputStream input = connection.getInputStream();
             StringBuffer buffer = new StringBuffer();
             if (input == null) {
-                throw new FetchException();
+                throw new ConnectionException();
             }
             reader = new BufferedReader(new InputStreamReader(input));
 
@@ -115,7 +118,7 @@ public abstract class ApiFetcher2 extends AsyncTask<Request, Void, Response> {
             }
 
             if (buffer.length() == 0) {
-                throw new FetchException();
+                throw new ApiException();
             }
 
             if (connection.getHeaderFields().containsKey("Set-Cookie")) {
@@ -126,7 +129,7 @@ public abstract class ApiFetcher2 extends AsyncTask<Request, Void, Response> {
             Log.v(TAG, "Response " + response);
         } catch (IOException e) {
             Log.e(TAG, "Connection error", e);
-            throw new FetchException();
+            throw new ConnectionException();
         } finally {
             if (connection != null) {
                 connection.disconnect();
@@ -151,12 +154,38 @@ public abstract class ApiFetcher2 extends AsyncTask<Request, Void, Response> {
             return new Response(new JSONObject(response));
         } catch (JSONException e) {
             Log.e(TAG, "Error parsing json", e);
-            throw new FetchException();
+            throw new JsonException();
         }
     }
 
     private void uiErrorExecute(Response response) {
-        // TODO Обработка ошибок
+        FetchException error = response.getError();
+        if (error != null) {
+            AlertDialog.Builder ad = new AlertDialog.Builder(getActivity());
+            ad.setIcon(R.drawable.ic_action_error);
+            try {
+                throw error;
+            } catch (ConnectionException e) {
+                ad.setTitle(R.string.error_connect);
+                ad.setMessage(R.string.error_message_connect);
+            } catch (JsonException e) {
+                ad.setTitle(R.string.error_json);
+                ad.setMessage(R.string.error_message_json);
+            } catch (ApiException e) {
+                ad.setTitle(R.string.error_api);
+                ad.setMessage(R.string.error_message_api);
+            } catch (FetchException e) {
+                ad.setTitle(R.string.error_common);
+                ad.setMessage(R.string.error_message_common);
+            }
+            ad.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+
+                }
+            });
+            ad.show();
+        }
     }
 
     protected void onPreExecute() {
@@ -189,7 +218,7 @@ public abstract class ApiFetcher2 extends AsyncTask<Request, Void, Response> {
                 }
                 uiExecute(response);
             } catch (JSONException e) {
-                response.setError(new FetchException());
+                response.setError(new JsonException());
                 uiErrorExecute(response);
             }
         } else  {
