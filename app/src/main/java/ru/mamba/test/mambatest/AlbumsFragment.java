@@ -3,6 +3,7 @@ package ru.mamba.test.mambatest;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -110,12 +111,17 @@ public class AlbumsFragment extends Fragment implements AdapterView.OnItemClickL
 
             Album album = getItem(position);
 
-            ImageView imageView = (ImageView)convertView.findViewById(R.id.image_view_album_photo);
             TextView titleView = (TextView)convertView.findViewById(R.id.text_view_album);
+            ImageView imageView = (ImageView) convertView.findViewById(R.id.image_view_album_photo);
 
-            //Picasso.with(getActivity()).load(album.getImage()).into(image);
-            mPhotoFetcher.queueThumbnail(imageView, album.getPhoto());
             titleView.setText(album.getTitle());
+
+            Bitmap noPhoto = BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.nophoto);
+            if (album.getPhoto() == null) {
+                imageView.setImageBitmap(noPhoto);
+            } else {
+                mPhotoFetcher.queueThumbnail(imageView, album.getPhoto());
+            }
 
             return convertView;
         }
@@ -143,7 +149,7 @@ public class AlbumsFragment extends Fragment implements AdapterView.OnItemClickL
                 Album album = new Album(
                     albumJson.getInt("id"),
                     albumJson.getString("name"),
-                    albumJson.getString("coverUrl")
+                    albumJson.isNull("photos") ? null : albumJson.getJSONArray("photos").getJSONObject(0).getString("squarePhotoUrl")
                 );
                 mAlbumAdapter.add(album);
             }

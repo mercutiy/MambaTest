@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -59,7 +60,7 @@ public class ContactsFragment extends Fragment implements AdapterView.OnItemClic
             @Override
             public void onPhotoDownloaded(ImageView imageView, Bitmap bitmap) {
                 if (isVisible()) {
-                       imageView.setImageBitmap(bitmap);
+                    imageView.setImageBitmap(bitmap);
                 }
             }
         });
@@ -112,14 +113,22 @@ public class ContactsFragment extends Fragment implements AdapterView.OnItemClic
 
             Contact contact = getItem(position);
 
-            ImageView imageView = (ImageView)convertView.findViewById(R.id.image_view_contact_photo);
             TextView nameAgeView = (TextView)convertView.findViewById(R.id.text_view_contact_name);
             TextView messagesView = (TextView)convertView.findViewById(R.id.text_view_contact_messages);
 
-            mPhotoFetcher.queueThumbnail(imageView, contact.getPhoto());
             // TODO Заменить конкатеницию
             nameAgeView.setText(contact.getName() + ", " + String.valueOf(contact.getAge()));
             messagesView.setText(getResources().getQuantityString(R.plurals.number_of_messages, contact.getMessages(), contact.getMessages()));
+
+            Bitmap noPhoto = BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.nophoto);
+            ImageView imageView = (ImageView)convertView.findViewById(R.id.image_view_contact_photo);
+
+            if (contact.getPhoto() == null) {
+                imageView.setImageBitmap(noPhoto);
+            } else {
+                mPhotoFetcher.queueThumbnail(imageView, contact.getPhoto());
+            }
+
 
             return convertView;
         }
@@ -162,7 +171,6 @@ public class ContactsFragment extends Fragment implements AdapterView.OnItemClic
                     contact.setAge(anketaJson.getInt("age"));
                     contact.setPhoto(anketaJson.getString("squarePhotoUrl"));
                 }
-                // TODO Сделать поддержку удаленной анкеты
 
                 mContactAdapter.add(contact);
             }
