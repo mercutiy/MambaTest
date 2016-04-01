@@ -16,6 +16,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
@@ -42,11 +43,15 @@ import ru.mamba.test.mambatest.model.Contact;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class ContactsFragment extends Fragment implements AdapterView.OnItemClickListener {
+public class ContactsFragment extends Fragment implements AdapterView.OnItemClickListener, AbsListView.OnScrollListener {
 
     private ContactAdapter mContactAdapter;
 
     private PhotoFetcher<ImageView> mPhotoFetcher;
+
+    int mTotal = -1;
+
+    int mCurrentTotal = -1;
 
     public ContactsFragment() {
     }
@@ -92,9 +97,7 @@ public class ContactsFragment extends Fragment implements AdapterView.OnItemClic
         ListView listView = (ListView)view.findViewById(R.id.list_view_contacts);
         listView.setAdapter(mContactAdapter);
         listView.setOnItemClickListener(this);
-
-        new ContactFetcher(getActivity()).execute();
-
+        listView.setOnScrollListener(this);
 
         return view;
     }
@@ -138,10 +141,6 @@ public class ContactsFragment extends Fragment implements AdapterView.OnItemClic
 
         public ContactFetcher(Activity activity) {
             super(activity);
-            HashMap<String, String> params = new HashMap<String, String>();
-            params.put("limit", "10");
-            int folderId = new Session(activity).getFolderId();
-            setRequest(new Request("/folders/" + String.valueOf(folderId) + "/contacts/", Request.GET, params));
         }
 
         @Override
@@ -175,6 +174,10 @@ public class ContactsFragment extends Fragment implements AdapterView.OnItemClic
                 mContactAdapter.add(contact);
             }
 
+            if (mTotal == -1) {
+                mTotal = contactsCount;
+            }
+
             ActionBar ab = ((AppCompatActivity)getActivity()).getSupportActionBar();
             if (ab != null) {
                 ab.setTitle(getResources().getQuantityString(R.plurals.number_of_contacts, contactsCount, contactsCount));
@@ -192,5 +195,28 @@ public class ContactsFragment extends Fragment implements AdapterView.OnItemClic
         Intent intent = new Intent(getActivity(), AnketaActivity.class);
         intent.putExtra(AnketaActivity.EXTRA_ANKETA_ID, contact.getAnketaId());
         startActivity(intent);
+    }
+
+    @Override
+    public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+    }
+
+    @Override
+    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+        int limit = 10;
+        if (
+            firstVisibleItem + visibleItemCount >= totalItemCount &&
+            (totalItemCount >= mCurrentTotal && mCurrentTotal + limit <= mTotal) || mCurrentTotal == -1
+        ) {
+            mCurrentTotal = totalItemCount + limit;
+
+            ContactFetcher contactFetcher = new ContactFetcher(getActivity());
+            HashMap<String, String> params = new HashMap<String, String>();
+            params.put("limit", "10");
+            params.put("offset", String.valueOf(totalItemCount));
+            int folderId = new Session(getActivity()).getFolderId();
+            contactFetcher.execute(new Request("/folders/" + String.valueOf(folderId) + "/contacts/", Request.GET, params));
+        }
     }
 }
