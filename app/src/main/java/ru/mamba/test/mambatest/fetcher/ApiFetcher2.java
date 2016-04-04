@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -22,6 +23,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Map;
 
+import ru.mamba.test.mambatest.LoginActivity;
 import ru.mamba.test.mambatest.R;
 
 public abstract class ApiFetcher2 extends AsyncTask<Request, Void, Response> {
@@ -214,7 +216,10 @@ public abstract class ApiFetcher2 extends AsyncTask<Request, Void, Response> {
         if (json != null) {
             try {
                 if (this instanceof Autharize && !json.getBoolean("isAuth")) {
-                    onPostExecute(getSession().restoreSession(getRequest()));
+                    getSession().restoreSession(getRequest());
+                    Intent intent = new Intent(getActivity(), LoginActivity.class);
+                    getActivity().startActivity(intent);
+                    return;
                 }
                 uiExecute(response);
             } catch (JSONException e) {

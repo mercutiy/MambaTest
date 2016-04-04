@@ -1,6 +1,7 @@
 package ru.mamba.test.mambatest.fetcher;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 
 import java.net.HttpURLConnection;
@@ -66,6 +67,8 @@ public class Session {
     }
 
     public Response restoreSession(Request request) {
+        // TODO Перелогин по secret
+        setSid("");
         return new Response(new FetchException());
     }
 
