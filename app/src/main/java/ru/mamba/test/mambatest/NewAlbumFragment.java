@@ -228,7 +228,7 @@ public class NewAlbumFragment extends Fragment {
 
             ArrayAdapter<Item> adapter = new ArrayAdapter<Item>(
                 getActivity().getApplicationContext(),
-                android.R.layout.simple_spinner_item,
+                R.layout.fb_single_select_item,
                 options
             );
             spinner.setAdapter(adapter);
