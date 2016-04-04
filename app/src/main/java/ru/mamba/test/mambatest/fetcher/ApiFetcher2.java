@@ -182,7 +182,6 @@ public abstract class ApiFetcher2 extends AsyncTask<Request, Void, Response> {
                 showErrorDialog(R.string.error_json, R.string.error_message_json);
             }
         }
-        showErrorDialog(R.string.error_common, R.string.error_message_common);
 
         return true;
     }

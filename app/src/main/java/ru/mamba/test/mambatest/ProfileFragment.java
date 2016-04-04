@@ -26,9 +26,11 @@ import java.io.IOException;
 import ru.mamba.test.mambatest.fetcher.ApiFetcher;
 import ru.mamba.test.mambatest.fetcher.ApiFetcher2;
 import ru.mamba.test.mambatest.fetcher.Autharize;
+import ru.mamba.test.mambatest.fetcher.ConnectionException;
 import ru.mamba.test.mambatest.fetcher.FetchException;
 import ru.mamba.test.mambatest.fetcher.ImageFetcher;
 import ru.mamba.test.mambatest.fetcher.ImageResponse;
+import ru.mamba.test.mambatest.fetcher.JsonException;
 import ru.mamba.test.mambatest.fetcher.Request;
 import ru.mamba.test.mambatest.fetcher.Response;
 import ru.mamba.test.mambatest.fetcher.Session;
@@ -92,8 +94,13 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             Response response = super.getResponse(request);
 
             try {
-                String photoSrc = response
-                    .getJson()
+                JSONObject json = response.getJson();
+
+                if (!json.getBoolean("isAuth")) {
+                    return response;
+                }
+
+                String photoSrc = json
                     .getJSONArray("sysResponsesContainer")
                     .getJSONObject(0)
                     .getJSONObject("anketa")
@@ -107,11 +114,11 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
             } catch (JSONException e) {
                 Log.e(TAG, "Error parsing json", e);
-                throw new FetchException();
+                throw new JsonException();
             }
             catch (IOException e) {
                 Log.e(TAG, "IO error", e);
-                throw new FetchException();
+                throw new ConnectionException();
             }
 
         }
