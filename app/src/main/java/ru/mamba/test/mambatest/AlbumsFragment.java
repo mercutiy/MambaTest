@@ -31,6 +31,7 @@ import java.util.HashMap;
 
 import ru.mamba.test.mambatest.fetcher.ApiFetcher;
 import ru.mamba.test.mambatest.fetcher.ApiFetcher2;
+import ru.mamba.test.mambatest.fetcher.Autharize;
 import ru.mamba.test.mambatest.fetcher.PhotoFetcher;
 import ru.mamba.test.mambatest.fetcher.Request;
 import ru.mamba.test.mambatest.fetcher.Response;
@@ -127,7 +128,7 @@ public class AlbumsFragment extends Fragment implements AdapterView.OnItemClickL
         }
     }
 
-    private class AlbumFetcher extends ApiFetcher2 {
+    private class AlbumFetcher extends ApiFetcher2 implements Autharize {
 
 
         public AlbumFetcher(Activity activity) {

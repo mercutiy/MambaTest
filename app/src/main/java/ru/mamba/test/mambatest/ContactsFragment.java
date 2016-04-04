@@ -33,6 +33,7 @@ import java.util.HashMap;
 
 import ru.mamba.test.mambatest.fetcher.ApiFetcher;
 import ru.mamba.test.mambatest.fetcher.ApiFetcher2;
+import ru.mamba.test.mambatest.fetcher.Autharize;
 import ru.mamba.test.mambatest.fetcher.PhotoFetcher;
 import ru.mamba.test.mambatest.fetcher.Request;
 import ru.mamba.test.mambatest.fetcher.Response;
@@ -137,7 +138,7 @@ public class ContactsFragment extends Fragment implements AdapterView.OnItemClic
         }
     }
 
-    private class ContactFetcher extends ApiFetcher2 {
+    private class ContactFetcher extends ApiFetcher2  implements Autharize {
 
         public ContactFetcher(Activity activity) {
             super(activity);

@@ -31,6 +31,7 @@ import java.util.Map;
 
 import ru.mamba.test.mambatest.fetcher.ApiFetcher;
 import ru.mamba.test.mambatest.fetcher.ApiFetcher2;
+import ru.mamba.test.mambatest.fetcher.Autharize;
 import ru.mamba.test.mambatest.fetcher.Request;
 import ru.mamba.test.mambatest.fetcher.Response;
 
@@ -79,7 +80,7 @@ public class NewAlbumFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
-    private class FormFetcher extends ApiFetcher2 {
+    private class FormFetcher extends ApiFetcher2 implements Autharize {
 
         private LayoutInflater mInflater;
 

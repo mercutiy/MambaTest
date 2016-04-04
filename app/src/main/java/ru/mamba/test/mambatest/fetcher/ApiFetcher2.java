@@ -160,34 +160,45 @@ public abstract class ApiFetcher2 extends AsyncTask<Request, Void, Response> {
         }
     }
 
-    private void uiErrorExecute(Response response) {
+    private boolean uiErrorExecute(Response response) {
         FetchException error = response.getError();
         if (error != null) {
-            AlertDialog.Builder ad = new AlertDialog.Builder(getActivity());
-            ad.setIcon(R.drawable.ic_action_error);
             try {
                 throw error;
             } catch (ConnectionException e) {
-                ad.setTitle(R.string.error_connect);
-                ad.setMessage(R.string.error_message_connect);
+                showErrorDialog(R.string.error_connect, R.string.error_message_connect);
             } catch (JsonException e) {
-                ad.setTitle(R.string.error_json);
-                ad.setMessage(R.string.error_message_json);
+                showErrorDialog(R.string.error_json, R.string.error_message_json);
             } catch (ApiException e) {
-                ad.setTitle(R.string.error_api);
-                ad.setMessage(R.string.error_message_api);
+                showErrorDialog(R.string.error_api, R.string.error_message_api);
             } catch (FetchException e) {
-                ad.setTitle(R.string.error_common);
-                ad.setMessage(R.string.error_message_common);
+                showErrorDialog(R.string.error_common, R.string.error_message_common);
             }
-            ad.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-
-                }
-            });
-            ad.show();
+        } else if (response.getJson() != null) {
+            try {
+                int errorCode = response.getJson().getInt("errorCode");
+                showErrorDialog(R.string.error_api, R.string.error_api);
+            } catch (JSONException e) {
+                showErrorDialog(R.string.error_json, R.string.error_message_json);
+            }
         }
+        showErrorDialog(R.string.error_common, R.string.error_message_common);
+
+        return true;
+    }
+
+    private void showErrorDialog(int title, int message) {
+        AlertDialog.Builder ad = new AlertDialog.Builder(getActivity());
+        ad.setIcon(R.drawable.ic_action_error);
+        ad.setTitle(title);
+        ad.setMessage(message);
+        ad.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+        ad.show();
     }
 
     protected void onPreExecute() {
@@ -214,6 +225,10 @@ public abstract class ApiFetcher2 extends AsyncTask<Request, Void, Response> {
         mDialog.dismiss();
         JSONObject json = response.getJson();
         if (json != null) {
+            if (json.has("errorCode")) {
+                uiErrorExecute(response);
+                return;
+            }
             try {
                 if (this instanceof Autharize && !json.getBoolean("isAuth")) {
                     getSession().restoreSession(getRequest());

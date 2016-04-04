@@ -23,6 +23,7 @@ import java.io.IOException;
 
 import ru.mamba.test.mambatest.fetcher.ApiFetcher;
 import ru.mamba.test.mambatest.fetcher.ApiFetcher2;
+import ru.mamba.test.mambatest.fetcher.Autharize;
 import ru.mamba.test.mambatest.fetcher.FetchException;
 import ru.mamba.test.mambatest.fetcher.ImageFetcher;
 import ru.mamba.test.mambatest.fetcher.ImageResponse;
@@ -76,7 +77,7 @@ public class AnketaFragment extends Fragment {
     }
 
 
-    private class AnketaFetcher extends ApiFetcher2 {
+    private class AnketaFetcher extends ApiFetcher2 implements Autharize {
 
 
         public AnketaFetcher(Activity activity, int anketaId) {
