@@ -17,6 +17,7 @@ public class AnketaActivity extends AppCompatActivity {
         setContentView(R.layout.activity_anketa);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         int anketaId = getIntent().getIntExtra(EXTRA_ANKETA_ID, 0);
         AnketaFragment fragment = AnketaFragment.newInstance(anketaId);
