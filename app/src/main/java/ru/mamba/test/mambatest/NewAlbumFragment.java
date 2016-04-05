@@ -74,7 +74,9 @@ public class NewAlbumFragment extends Fragment {
         if (item.getItemId() == R.id.action_submit_album) {
             mLayout.removeAllViews();
             JSONObject json = mFetcher.getNewRequest();
-            new FormFetcher(getActivity()).execute(new Request("/albums/", Request.POST, null, json));
+            mFetcher = new FormFetcher(getActivity());
+            mFetcher.execute(new Request("/albums/", Request.POST, null, json));
+            return true;
 
         }
         return super.onOptionsItemSelected(item);
