@@ -1,7 +1,6 @@
 package ru.mamba.test.mambatest;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -17,8 +16,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import ru.mamba.test.mambatest.fetcher.ApiFetcher;
-import ru.mamba.test.mambatest.fetcher.ApiFetcher2;
-import ru.mamba.test.mambatest.fetcher.FetchException;
 import ru.mamba.test.mambatest.fetcher.Request;
 import ru.mamba.test.mambatest.fetcher.Response;
 import ru.mamba.test.mambatest.fetcher.Session;
@@ -75,7 +72,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-    private class LoginFetcher extends ApiFetcher2 {
+    private class LoginFetcher extends ApiFetcher {
 
         public LoginFetcher(Activity activity) {
             super(activity);

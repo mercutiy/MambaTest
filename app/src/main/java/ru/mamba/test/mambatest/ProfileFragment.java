@@ -1,7 +1,6 @@
 package ru.mamba.test.mambatest;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.support.v4.app.Fragment;
@@ -15,7 +14,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -24,7 +22,6 @@ import org.json.JSONObject;
 import java.io.IOException;
 
 import ru.mamba.test.mambatest.fetcher.ApiFetcher;
-import ru.mamba.test.mambatest.fetcher.ApiFetcher2;
 import ru.mamba.test.mambatest.fetcher.Autharize;
 import ru.mamba.test.mambatest.fetcher.ConnectionException;
 import ru.mamba.test.mambatest.fetcher.FetchException;
@@ -55,6 +52,14 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
     private Button mContactButton;
 
+    private ProfileFetcher mFetcher;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -69,13 +74,17 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         mAlbumButton.setOnClickListener(this);
         mContactButton.setOnClickListener(this);
 
-        new ProfileFetcher(getActivity()).execute();
+        if (mFetcher == null) {
+            mFetcher = new ProfileFetcher(getActivity());
+            mFetcher.execute();
+        } else {
+            mFetcher.handleResponse();
+        }
 
         return view;
     }
 
-
-    private class ProfileFetcher extends ApiFetcher2 implements Autharize {
+    private class ProfileFetcher extends ApiFetcher implements Autharize {
 
         public ProfileFetcher(Activity activity) {
             super(activity);

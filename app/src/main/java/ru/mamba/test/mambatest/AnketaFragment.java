@@ -1,9 +1,7 @@
 package ru.mamba.test.mambatest;
 
 import android.app.Activity;
-import android.content.Context;
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
@@ -22,7 +20,6 @@ import org.json.JSONObject;
 import java.io.IOException;
 
 import ru.mamba.test.mambatest.fetcher.ApiFetcher;
-import ru.mamba.test.mambatest.fetcher.ApiFetcher2;
 import ru.mamba.test.mambatest.fetcher.Autharize;
 import ru.mamba.test.mambatest.fetcher.FetchException;
 import ru.mamba.test.mambatest.fetcher.ImageFetcher;
@@ -43,6 +40,8 @@ public class AnketaFragment extends Fragment {
 
     private ImageView mPhoto;
 
+    private AnketaFetcher mFetcher;
+
     public AnketaFragment() {
     }
 
@@ -57,6 +56,7 @@ public class AnketaFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRetainInstance(true);
         if (getArguments() != null) {
             mAnketaId = getArguments().getInt(ARG_ANKETA_ID);
         }
@@ -71,13 +71,21 @@ public class AnketaFragment extends Fragment {
         mInterests = (TextView)view.findViewById(R.id.text_view_anketa_interests);
         mPhoto = (ImageView)view.findViewById(R.id.image_view_anketa_photo);
 
+        if (mFetcher == null) {
+            mFetcher = new AnketaFetcher(getActivity(), mAnketaId);
+            mFetcher.execute();
+        } else {
+            mFetcher.handleResponse();
+        }
+
+
         new AnketaFetcher(getActivity(), mAnketaId).execute();
 
         return view;
     }
 
 
-    private class AnketaFetcher extends ApiFetcher2 implements Autharize {
+    private class AnketaFetcher extends ApiFetcher implements Autharize {
 
 
         public AnketaFetcher(Activity activity, int anketaId) {
