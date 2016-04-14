@@ -1,5 +1,7 @@
 package ru.mamba.test.mambatest.model;
 
+import android.graphics.Bitmap;
+
 public class Contact {
 
     private int mId;
@@ -11,6 +13,8 @@ public class Contact {
     private int mAge;
 
     private String mPhoto;
+
+    private Bitmap mProtoBitmap;
 
     private boolean mDeleted = false;
 
@@ -61,5 +65,13 @@ public class Contact {
 
     public void setDeleted(boolean deleted) {
         mDeleted = deleted;
+    }
+
+    public Bitmap getProtoBitmap() {
+        return mProtoBitmap;
+    }
+
+    public void setProtoBitmap(Bitmap protoBitmap) {
+        mProtoBitmap = protoBitmap;
     }
 }

@@ -28,6 +28,7 @@ import java.util.HashMap;
 
 import ru.mamba.test.mambatest.fetcher.ApiFetcher;
 import ru.mamba.test.mambatest.fetcher.Autharize;
+import ru.mamba.test.mambatest.fetcher.ImageFetcher;
 import ru.mamba.test.mambatest.fetcher.PhotoFetcher;
 import ru.mamba.test.mambatest.fetcher.Request;
 import ru.mamba.test.mambatest.fetcher.Response;
@@ -41,13 +42,13 @@ public class ContactsFragment extends Fragment implements AdapterView.OnItemClic
 
     private ContactAdapter mContactAdapter;
 
-    private PhotoFetcher<ImageView> mPhotoFetcher;
+    private PhotoFetcher<Contact> mPhotoFetcher;
 
     int mTotal = -1;
 
     int mCurrentTotal = -1;
 
-    //private ContactFetcher mFetcher;
+    ListView mListView;
 
     public ContactsFragment() {
     }
@@ -56,12 +57,13 @@ public class ContactsFragment extends Fragment implements AdapterView.OnItemClic
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mPhotoFetcher = new PhotoFetcher<ImageView>(new Handler());
-        mPhotoFetcher.setListener(new PhotoFetcher.Listener<ImageView>() {
+        mPhotoFetcher = new PhotoFetcher<Contact>(new Handler());
+        mPhotoFetcher.setListener(new PhotoFetcher.Listener<Contact>() {
             @Override
-            public void onPhotoDownloaded(ImageView imageView, Bitmap bitmap) {
+            public void onPhotoDownloaded(Contact contact, Bitmap bitmap) {
+                contact.setProtoBitmap(bitmap);
                 if (isVisible()) {
-                    imageView.setImageBitmap(bitmap);
+                    mContactAdapter.notifyDataSetChanged();
                 }
             }
         });
@@ -69,6 +71,7 @@ public class ContactsFragment extends Fragment implements AdapterView.OnItemClic
         mPhotoFetcher.getLooper();
 
         setHasOptionsMenu(true);
+        setRetainInstance(true);
     }
 
     @Override
@@ -124,12 +127,13 @@ public class ContactsFragment extends Fragment implements AdapterView.OnItemClic
             Bitmap noPhoto = BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.nophoto);
             ImageView imageView = (ImageView)convertView.findViewById(R.id.image_view_contact_photo);
 
-            if (contact.getPhoto() == null) {
+            if (contact.getPhoto() == null || "".equals(contact.getPhoto())) {
                 imageView.setImageBitmap(noPhoto);
+            } else if (contact.getProtoBitmap() != null) {
+                imageView.setImageBitmap(contact.getProtoBitmap());
             } else {
-                mPhotoFetcher.queueThumbnail(imageView, contact.getPhoto());
+                mPhotoFetcher.queueThumbnail(contact, contact.getPhoto());
             }
-
 
             return convertView;
         }
