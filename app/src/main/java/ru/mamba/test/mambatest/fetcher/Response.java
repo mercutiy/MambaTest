@@ -2,7 +2,9 @@ package ru.mamba.test.mambatest.fetcher;
 
 import org.json.JSONObject;
 
-public class Response {
+import java.io.Serializable;
+
+public class Response implements Serializable {
 
     JSONObject mJson;
 

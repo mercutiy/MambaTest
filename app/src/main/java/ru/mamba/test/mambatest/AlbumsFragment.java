@@ -1,7 +1,6 @@
 package ru.mamba.test.mambatest;
 
 import android.app.Activity;
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Handler;
@@ -9,10 +8,7 @@ import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,7 +26,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import ru.mamba.test.mambatest.fetcher.ApiFetcher;
-import ru.mamba.test.mambatest.fetcher.ApiFetcher2;
 import ru.mamba.test.mambatest.fetcher.Autharize;
 import ru.mamba.test.mambatest.fetcher.PhotoFetcher;
 import ru.mamba.test.mambatest.fetcher.Request;
@@ -47,7 +42,7 @@ public class AlbumsFragment extends Fragment implements AdapterView.OnItemClickL
 
     private PhotoFetcher<ImageView> mPhotoFetcher;
 
-    private MenuItem mMenuAdd;
+    private AlbumFetcher mFetcher;
 
     public AlbumsFragment() {
     }
@@ -68,6 +63,7 @@ public class AlbumsFragment extends Fragment implements AdapterView.OnItemClickL
         );
         mPhotoFetcher.start();
         mPhotoFetcher.getLooper();
+        setRetainInstance(true);
     }
 
     @Override
@@ -93,7 +89,12 @@ public class AlbumsFragment extends Fragment implements AdapterView.OnItemClickL
         listView.setAdapter(mAlbumAdapter);
         listView.setOnItemClickListener(this);
 
-        new AlbumFetcher(getActivity()).execute();
+        if (mFetcher == null) {
+            mFetcher = new AlbumFetcher(getActivity());
+            mFetcher.execute();
+        } else {
+            mFetcher.handleResponse();
+        }
 
         return view;
     }
@@ -128,7 +129,7 @@ public class AlbumsFragment extends Fragment implements AdapterView.OnItemClickL
         }
     }
 
-    private class AlbumFetcher extends ApiFetcher2 implements Autharize {
+    private class AlbumFetcher extends ApiFetcher implements Autharize {
 
 
         public AlbumFetcher(Activity activity) {

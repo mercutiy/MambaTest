@@ -1,7 +1,6 @@
 package ru.mamba.test.mambatest;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -30,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 
 import ru.mamba.test.mambatest.fetcher.ApiFetcher;
-import ru.mamba.test.mambatest.fetcher.ApiFetcher2;
 import ru.mamba.test.mambatest.fetcher.Autharize;
 import ru.mamba.test.mambatest.fetcher.Request;
 import ru.mamba.test.mambatest.fetcher.Response;
@@ -48,6 +46,7 @@ public class NewAlbumFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        setRetainInstance(true);
     }
 
     @Override
@@ -62,9 +61,12 @@ public class NewAlbumFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_new_album, container, false);
         mLayout = (LinearLayout)view.findViewById(R.id.layout_form);
 
-        mFetcher = new FormFetcher(getActivity());
-        mFetcher.execute();
-
+        if (mFetcher == null) {
+            mFetcher = new FormFetcher(getActivity());
+            mFetcher.execute();
+        } else {
+            mFetcher.handleResponse();
+        }
 
         return view;
     }
@@ -82,7 +84,7 @@ public class NewAlbumFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
-    private class FormFetcher extends ApiFetcher2 implements Autharize {
+    private class FormFetcher extends ApiFetcher implements Autharize {
 
         private LayoutInflater mInflater;
 

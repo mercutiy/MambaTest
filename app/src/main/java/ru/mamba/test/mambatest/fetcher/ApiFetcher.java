@@ -1,7 +1,10 @@
 package ru.mamba.test.mambatest.fetcher;
 
-import android.content.Context;
-import android.content.SharedPreferences;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -17,60 +20,64 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-public abstract class ApiFetcher extends AsyncTask<Request, Void, JSONObject> {
+import ru.mamba.test.mambatest.LoginActivity;
+import ru.mamba.test.mambatest.R;
 
-    private static final String TAG = ApiFetcher.class.getCanonicalName();
+public abstract class ApiFetcher extends AsyncTask<Request, Void, Response> {
 
-    public static final String PREF_SESSION = "session";
+    protected static final String TAG = ApiFetcher.class.getCanonicalName();
 
-    public static final String PREF_FIELD_SID = "SID";
+    private static final String sBaseUrl = "http://api.mobile-api.ru/v5.2.20.0/";
 
-    public static final String PREF_FIELD_SECRET = "SECRET";
+    private Activity mActivity;
 
-    private final String mBaseUrl = "http://api.mobile-api.ru/v5.2.20.0/";
+    private Session mSession;
 
-    protected Request mRequest;
+    private Request mRequest;
 
-    private Context mContext;
+    private Response mResponse;
 
-    public SharedPreferences mProperties;
+    public ProgressDialog mDialog;
 
-    private FetchException mException = new FetchException();
-
-    public ApiFetcher(Context context) {
-        mContext = context;
-        mProperties = mContext.getSharedPreferences(PREF_SESSION, Context.MODE_PRIVATE);
+    public ApiFetcher(Activity activity) {
+        mActivity = activity;
+        mSession = new Session(activity);
     }
 
-    @Override
-    protected JSONObject doInBackground(Request... params) {
-        Request request = null;
 
-        if (params.length > 0) {
-            request = params[0];
-        } else if(mRequest != null) {
-            request = mRequest;
-        } else {
-            Log.e(TAG, "Wrong argument");
-            mException = new FetchException();
-            return null;
-        }
-
-        try {
-            return getResponse(request);
-        } catch (FetchException e) {
-            mException = e;
-            return null;
-        }
-
+    protected Activity getActivity() {
+        return mActivity;
     }
 
-    protected JSONObject getResponse(Request request) throws FetchException {
+    protected Session getSession() {
+        return mSession;
+    }
+
+    public Request getRequest() {
+        return mRequest;
+    }
+
+    public void setRequest(Request request) {
+        mRequest = request;
+    }
+
+    public void setResponse(Response response) {
+        mResponse = response;
+    }
+
+    protected Request getRequest(Request request) throws FetchException {
+        if (request != null) {
+            mRequest = request;
+        }
+        if (mRequest != null) {
+            return mRequest;
+        }
+        throw new FetchException();
+    }
+
+    protected Response getResponse(Request request) throws FetchException {
         HttpURLConnection connection = null;
         BufferedReader reader = null;
         BufferedWriter writer = null;
@@ -86,30 +93,29 @@ public abstract class ApiFetcher extends AsyncTask<Request, Void, JSONObject> {
 
 
         try {
-            URL url = new URL(mBaseUrl + request.getPath() + stringParams);
+            URL url = new URL(sBaseUrl + request.getPath() + stringParams);
             connection = (HttpURLConnection)url.openConnection();
             connection.setRequestMethod(request.getMethod());
-            String sid = mProperties.getString(PREF_FIELD_SID, "");
-            if (!sid.isEmpty()) {
-                connection.addRequestProperty("Cookie", "mmbsid=" + sid);
-            }
+
+            getSession().setCookie(connection);
+
             if (request.getPost() != null) {
                 OutputStream output = connection.getOutputStream();
                 writer = new BufferedWriter(new OutputStreamWriter(output, "UTF-8"));
                 writer.write(request.getPost().toString());
                 writer.flush();
             }
+
             connection.connect();
 
-
             if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
-                throw new FetchException();
+                throw new ConnectionException();
             }
 
             InputStream input = connection.getInputStream();
             StringBuffer buffer = new StringBuffer();
             if (input == null) {
-                throw new FetchException();
+                throw new ConnectionException();
             }
             reader = new BufferedReader(new InputStreamReader(input));
 
@@ -119,28 +125,18 @@ public abstract class ApiFetcher extends AsyncTask<Request, Void, JSONObject> {
             }
 
             if (buffer.length() == 0) {
-                throw new FetchException();
+                throw new ApiException();
             }
 
             if (connection.getHeaderFields().containsKey("Set-Cookie")) {
-                List<String> cookies = connection.getHeaderFields().get("Set-Cookie");
-                for (String cookie : cookies) {
-                    Matcher matcher = Pattern.compile("mmbsid=([^;]+);").matcher(cookie);
-                    if (matcher.find()) {
-                        String newSid = matcher.group(1);
-                        if (!newSid.equals(sid)) {
-                            mProperties.edit().putString(PREF_FIELD_SID, newSid).apply();
-                        }
-                        break;
-                    }
-                }
+                getSession().saveSid(connection.getHeaderFields().get("Set-Cookie"));
             }
 
             response = buffer.toString();
             Log.v(TAG, "Response " + response);
         } catch (IOException e) {
             Log.e(TAG, "Connection error", e);
-            throw new FetchException();
+            throw new ConnectionException();
         } finally {
             if (connection != null) {
                 connection.disconnect();
@@ -162,12 +158,107 @@ public abstract class ApiFetcher extends AsyncTask<Request, Void, JSONObject> {
         }
 
         try {
-            return new JSONObject(response);
+            mResponse = new Response(new JSONObject(response));
+            return mResponse;
         } catch (JSONException e) {
             Log.e(TAG, "Error parsing json", e);
-            throw new FetchException();
+            throw new JsonException();
         }
     }
 
+    private boolean uiErrorExecute(Response response) {
+        FetchException error = response.getError();
+        if (error != null) {
+            try {
+                throw error;
+            } catch (ConnectionException e) {
+                showErrorDialog(R.string.error_connect, R.string.error_message_connect);
+            } catch (JsonException e) {
+                showErrorDialog(R.string.error_json, R.string.error_message_json);
+            } catch (ApiException e) {
+                showErrorDialog(R.string.error_api, R.string.error_message_api);
+            } catch (FetchException e) {
+                showErrorDialog(R.string.error_common, R.string.error_message_common);
+            }
+        } else if (response.getJson() != null) {
+            try {
+                int errorCode = response.getJson().getInt("errorCode");
+                showErrorDialog(R.string.error_api, R.string.error_api);
+            } catch (JSONException e) {
+                showErrorDialog(R.string.error_json, R.string.error_message_json);
+            }
+        }
 
+        return true;
+    }
+
+    private void showErrorDialog(int title, int message) {
+        AlertDialog.Builder ad = new AlertDialog.Builder(getActivity());
+        ad.setIcon(R.drawable.ic_action_error);
+        ad.setTitle(title);
+        ad.setMessage(message);
+        ad.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+        ad.show();
+    }
+
+    protected void onPreExecute() {
+        mDialog = new ProgressDialog(getActivity());
+        mDialog.setMessage(mActivity.getResources().getString(R.string.loading));
+        mDialog.setIndeterminate(true);
+        mDialog.setCancelable(true);
+        mDialog.show();
+    }
+
+
+    @Override
+    protected Response doInBackground(Request... params) {
+        try {
+            return getResponse(getRequest(params.length > 0 ? params[0] : null));
+        } catch (FetchException e) {
+            return new Response(e);
+        }
+
+    }
+
+    @Override
+    protected void onPostExecute(Response response) {
+        mDialog.dismiss();
+        setResponse(response);
+        handleResponse();
+    }
+
+    public void handleResponse() {
+        if (mResponse == null) {
+            uiErrorExecute(mResponse);
+        }
+        JSONObject json = mResponse.getJson();
+        if (json != null) {
+            if (json.has("errorCode")) {
+                uiErrorExecute(mResponse);
+                return;
+            }
+            try {
+                if (this instanceof Autharize && !json.getBoolean("isAuth")) {
+                    getSession().restoreSession(getRequest());
+                    Intent intent = new Intent(getActivity(), LoginActivity.class);
+                    getActivity().startActivity(intent);
+                    return;
+                }
+                uiExecute(mResponse);
+            } catch (JSONException e) {
+                mResponse.setError(new JsonException());
+                uiErrorExecute(mResponse);
+            }
+        } else  {
+            uiErrorExecute(mResponse);
+        }
+
+    }
+
+    protected abstract void uiExecute(Response response) throws JSONException;
 }

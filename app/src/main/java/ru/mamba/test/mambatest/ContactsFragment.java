@@ -1,7 +1,6 @@
 package ru.mamba.test.mambatest;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -10,10 +9,7 @@ import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
@@ -22,7 +18,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -32,13 +27,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import ru.mamba.test.mambatest.fetcher.ApiFetcher;
-import ru.mamba.test.mambatest.fetcher.ApiFetcher2;
 import ru.mamba.test.mambatest.fetcher.Autharize;
+import ru.mamba.test.mambatest.fetcher.ImageFetcher;
 import ru.mamba.test.mambatest.fetcher.PhotoFetcher;
 import ru.mamba.test.mambatest.fetcher.Request;
 import ru.mamba.test.mambatest.fetcher.Response;
 import ru.mamba.test.mambatest.fetcher.Session;
-import ru.mamba.test.mambatest.model.Album;
 import ru.mamba.test.mambatest.model.Contact;
 
 /**
@@ -48,11 +42,13 @@ public class ContactsFragment extends Fragment implements AdapterView.OnItemClic
 
     private ContactAdapter mContactAdapter;
 
-    private PhotoFetcher<ImageView> mPhotoFetcher;
+    private PhotoFetcher<Contact> mPhotoFetcher;
 
     int mTotal = -1;
 
     int mCurrentTotal = -1;
+
+    ListView mListView;
 
     public ContactsFragment() {
     }
@@ -61,12 +57,13 @@ public class ContactsFragment extends Fragment implements AdapterView.OnItemClic
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mPhotoFetcher = new PhotoFetcher<ImageView>(new Handler());
-        mPhotoFetcher.setListener(new PhotoFetcher.Listener<ImageView>() {
+        mPhotoFetcher = new PhotoFetcher<Contact>(new Handler());
+        mPhotoFetcher.setListener(new PhotoFetcher.Listener<Contact>() {
             @Override
-            public void onPhotoDownloaded(ImageView imageView, Bitmap bitmap) {
+            public void onPhotoDownloaded(Contact contact, Bitmap bitmap) {
+                contact.setProtoBitmap(bitmap);
                 if (isVisible()) {
-                    imageView.setImageBitmap(bitmap);
+                    mContactAdapter.notifyDataSetChanged();
                 }
             }
         });
@@ -74,6 +71,7 @@ public class ContactsFragment extends Fragment implements AdapterView.OnItemClic
         mPhotoFetcher.getLooper();
 
         setHasOptionsMenu(true);
+        setRetainInstance(true);
     }
 
     @Override
@@ -93,7 +91,9 @@ public class ContactsFragment extends Fragment implements AdapterView.OnItemClic
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_contacts, container, false);
 
-        mContactAdapter = new ContactAdapter(new ArrayList<Contact>());
+        if (mContactAdapter == null) {
+            mContactAdapter = new ContactAdapter(new ArrayList<Contact>());
+        }
 
         ListView listView = (ListView)view.findViewById(R.id.list_view_contacts);
         listView.setAdapter(mContactAdapter);
@@ -127,18 +127,19 @@ public class ContactsFragment extends Fragment implements AdapterView.OnItemClic
             Bitmap noPhoto = BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.nophoto);
             ImageView imageView = (ImageView)convertView.findViewById(R.id.image_view_contact_photo);
 
-            if (contact.getPhoto() == null) {
+            if (contact.getPhoto() == null || "".equals(contact.getPhoto())) {
                 imageView.setImageBitmap(noPhoto);
+            } else if (contact.getProtoBitmap() != null) {
+                imageView.setImageBitmap(contact.getProtoBitmap());
             } else {
-                mPhotoFetcher.queueThumbnail(imageView, contact.getPhoto());
+                mPhotoFetcher.queueThumbnail(contact, contact.getPhoto());
             }
-
 
             return convertView;
         }
     }
 
-    private class ContactFetcher extends ApiFetcher2  implements Autharize {
+    private class ContactFetcher extends ApiFetcher implements Autharize {
 
         public ContactFetcher(Activity activity) {
             super(activity);
