@@ -21,14 +21,23 @@ public class Session {
 
     public static final String PREF_FIELD_FOLDER = "FOLDER";
 
+    private static Session sInstance;
+
     private SharedPreferences mPreferences;
 
     private String mSid = null;
 
     private int mAnketaId = -1;
 
-    public Session(Context context) {
+    private Session(Context context) {
         mPreferences = context.getSharedPreferences(PREF_SESSION, Context.MODE_PRIVATE);
+    }
+
+    public static Session getInstance(Context context) {
+        if (sInstance == null) {
+            sInstance = new Session(context);
+        }
+        return sInstance;
     }
 
     public String getSid() {

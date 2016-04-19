@@ -88,7 +88,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                 return;
             }
 
-            Session session = new Session(getActivity());
+            Session session = Session.getInstance(getActivity());
             session.setSecret(json.getString("authSecret"));
             session.setAnketaId(json.getJSONObject("profile").getInt("id"));
 
