@@ -12,7 +12,7 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        String sid = new Session(this).getSid();
+        String sid = Session.getInstance(this).getSid();
         if (sid.length() > 0) {
             startActivity(new Intent(this, ProfileActivity.class));
         }

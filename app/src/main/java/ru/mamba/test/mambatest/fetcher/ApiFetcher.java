@@ -43,7 +43,7 @@ public abstract class ApiFetcher extends AsyncTask<Request, Void, Response> {
 
     public ApiFetcher(Activity activity) {
         mActivity = activity;
-        mSession = new Session(activity);
+        mSession = Session.getInstance(activity);
     }
 
 

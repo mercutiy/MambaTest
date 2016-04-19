@@ -88,7 +88,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
         public ProfileFetcher(Activity activity) {
             super(activity);
-            int anketaId = new Session(activity).getAnketaId();
+            int anketaId = Session.getInstance(activity).getAnketaId();
             try {
                 JSONObject request = new JSONObject("{\"sysRequestsContainer\":[{\"method\":\"GET\", \"uri\":\"/profile/\", \"params\":{}}, {\"method\":\"GET\", \"uri\":\"/folders/\", \"params\":{}}, {\"method\":\"GET\", \"uri\":\"/users/" + String.valueOf(anketaId) + "/albums/\", \"params\":{}}]}");
                 setRequest(new Request("", Request.POST, null, request));
@@ -181,7 +181,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                 ab.setTitle(title);
             }
 
-            new Session(getActivity()).setFolderId(folder.getInt("id"));
+            Session.getInstance(getActivity()).setFolderId(folder.getInt("id"));
         }
     }
 

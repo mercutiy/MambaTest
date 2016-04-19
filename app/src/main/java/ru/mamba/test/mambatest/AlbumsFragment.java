@@ -140,7 +140,7 @@ public class AlbumsFragment extends Fragment implements AdapterView.OnItemClickL
             HashMap<String, String> params = new HashMap<String, String>();
             params.put("photos", "true");
             params.put("limit", "1");
-            int anketaId = new Session(activity).getAnketaId();
+            int anketaId = Session.getInstance(activity).getAnketaId();
             setRequest(new Request("/users/" + String.valueOf(anketaId) + "/albums/", Request.GET, params));
         }
 

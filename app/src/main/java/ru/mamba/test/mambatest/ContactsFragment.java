@@ -217,7 +217,7 @@ public class ContactsFragment extends Fragment implements AdapterView.OnItemClic
             HashMap<String, String> params = new HashMap<String, String>();
             params.put("limit", "10");
             params.put("offset", String.valueOf(totalItemCount));
-            int folderId = new Session(getActivity()).getFolderId();
+            int folderId = Session.getInstance(getActivity()).getFolderId();
             contactFetcher.execute(new Request("/folders/" + String.valueOf(folderId) + "/contacts/", Request.GET, params));
         }
     }
