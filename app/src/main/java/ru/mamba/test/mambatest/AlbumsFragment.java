@@ -40,7 +40,7 @@ public class AlbumsFragment extends Fragment implements AdapterView.OnItemClickL
 
     private AlbumAdapter mAlbumAdapter;
 
-    private PhotoFetcher<ImageView> mPhotoFetcher;
+    private PhotoFetcher<Album> mPhotoFetcher;
 
     private AlbumFetcher mFetcher;
 
@@ -51,12 +51,13 @@ public class AlbumsFragment extends Fragment implements AdapterView.OnItemClickL
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mPhotoFetcher = new PhotoFetcher<ImageView>(new Handler());
-        mPhotoFetcher.setListener(new PhotoFetcher.Listener<ImageView>() {
+        mPhotoFetcher = new PhotoFetcher<Album>(new Handler());
+        mPhotoFetcher.setListener(new PhotoFetcher.Listener<Album>() {
                  @Override
-                 public void onPhotoDownloaded(ImageView imageView, Bitmap bitmap) {
+                 public void onPhotoDownloaded(Album album, Bitmap bitmap) {
+                     album.setPhotoBitmap(bitmap);
                      if (isVisible()) {
-                         imageView.setImageBitmap(bitmap);
+                         mAlbumAdapter.notifyDataSetChanged();
                      }
                  }
              }
@@ -119,10 +120,12 @@ public class AlbumsFragment extends Fragment implements AdapterView.OnItemClickL
             titleView.setText(album.getTitle());
 
             Bitmap noPhoto = BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.nophoto);
-            if (album.getPhoto() == null) {
+            if (album.getPhoto() == null || "".equals(album.getPhoto())) {
                 imageView.setImageBitmap(noPhoto);
+            } else if (album.getPhotoBitmap() == null) {
+                mPhotoFetcher.queueThumbnail(album, album.getPhoto());
             } else {
-                mPhotoFetcher.queueThumbnail(imageView, album.getPhoto());
+                imageView.setImageBitmap(album.getPhotoBitmap());
             }
 
             return convertView;
