@@ -1,5 +1,7 @@
 package ru.mamba.test.mambatest.model;
 
+import android.graphics.Bitmap;
+
 public class Album {
 
     private int mId;
@@ -7,6 +9,8 @@ public class Album {
     private String mTitle;
 
     private String mPhoto;
+
+    private Bitmap mPhotoBitmap;
 
     public Album(int id, String title, String photo) {
         mId = id;
@@ -24,5 +28,13 @@ public class Album {
 
     public int getId() {
         return mId;
+    }
+
+    public Bitmap getPhotoBitmap() {
+        return mPhotoBitmap;
+    }
+
+    public void setPhotoBitmap(Bitmap photoBitmap) {
+        mPhotoBitmap = photoBitmap;
     }
 }
