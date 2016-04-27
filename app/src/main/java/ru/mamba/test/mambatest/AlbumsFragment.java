@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -25,7 +24,11 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import ru.mamba.test.mambatest.api.callback.Callback1;
+import ru.mamba.test.mambatest.api.controller.Albums;
+import ru.mamba.test.mambatest.api.controller.Controller;
 import ru.mamba.test.mambatest.fetcher.ApiFetcher;
+import ru.mamba.test.mambatest.api.Fetcher;
 import ru.mamba.test.mambatest.fetcher.Autharize;
 import ru.mamba.test.mambatest.fetcher.PhotoFetcher;
 import ru.mamba.test.mambatest.fetcher.Request;
@@ -36,7 +39,7 @@ import ru.mamba.test.mambatest.model.Album;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class AlbumsFragment extends Fragment implements AdapterView.OnItemClickListener {
+public class AlbumsFragment extends Fragment implements AdapterView.OnItemClickListener, Callback1<Albums.Model> {
 
     private AlbumAdapter mAlbumAdapter;
 
@@ -96,6 +99,10 @@ public class AlbumsFragment extends Fragment implements AdapterView.OnItemClickL
         } else {
             mFetcher.handleResponse();
         }
+
+        Fetcher albumsFetcher = new Fetcher(getActivity(), this);
+        Controller controller = new Albums(Session.getInstance(getActivity()).getAnketaId(), true, 1);
+        albumsFetcher.fetch(controller);
 
         return view;
     }
@@ -169,5 +176,18 @@ public class AlbumsFragment extends Fragment implements AdapterView.OnItemClickL
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Album album = (Album)mAlbumAdapter.getItem(position);
+    }
+
+    @Override
+    public void onResponse(Albums.Model model) {
+        for (Album album : model.getAlbums()) {
+            mAlbumAdapter.add(album);
+        }
+
+        ActionBar ab = ((AppCompatActivity)getActivity()).getSupportActionBar();
+        if (ab != null) {
+            ab.setTitle(getResources().getQuantityString(R.plurals.number_of_albums, model.getAlbums().length, model.getAlbums().length));
+        }
+
     }
 }
