@@ -56,15 +56,14 @@ public class AlbumsFragment extends Fragment implements AdapterView.OnItemClickL
         super.onCreate(savedInstanceState);
         mPhotoFetcher = new PhotoFetcher<Album>(new Handler());
         mPhotoFetcher.setListener(new PhotoFetcher.Listener<Album>() {
-                 @Override
-                 public void onPhotoDownloaded(Album album, Bitmap bitmap) {
-                     album.setPhotoBitmap(bitmap);
-                     if (isVisible()) {
-                         mAlbumAdapter.notifyDataSetChanged();
-                     }
-                 }
-             }
-        );
+            @Override
+            public void onPhotoDownloaded(Album album, Bitmap bitmap) {
+                album.setPhotoBitmap(bitmap);
+                if (isVisible()) {
+                    mAlbumAdapter.notifyDataSetChanged();
+                }
+            }
+        });
         mPhotoFetcher.start();
         mPhotoFetcher.getLooper();
         setRetainInstance(true);

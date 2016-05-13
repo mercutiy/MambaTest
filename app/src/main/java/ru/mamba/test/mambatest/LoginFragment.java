@@ -15,6 +15,9 @@ import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import ru.mamba.test.mambatest.api.Fetcher;
+import ru.mamba.test.mambatest.api.callback.Callback1;
+import ru.mamba.test.mambatest.api.controller.Login;
 import ru.mamba.test.mambatest.fetcher.ApiFetcher;
 import ru.mamba.test.mambatest.fetcher.Request;
 import ru.mamba.test.mambatest.fetcher.Response;
@@ -23,9 +26,7 @@ import ru.mamba.test.mambatest.fetcher.Session;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class LoginFragment extends Fragment implements View.OnClickListener {
-
-    private static final String TAG = LoginFragment.class.getCanonicalName();
+public class LoginFragment extends Fragment implements View.OnClickListener, Callback1<Login.Model> {
 
     Button mLoginButton;
 
@@ -53,48 +54,25 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.button_login) {
-            JSONObject jsonRequest = new JSONObject();
-            try {
-                jsonRequest.put("login", mEditLogin.getText().toString());
-                jsonRequest.put("password", mEditPassword.getText().toString());
-            } catch (JSONException e) {
-                Log.e(TAG, "json creating error", e);
-                return;
-            }
-            Request request = new Request(
-                "login/",
-                Request.POST,
-                null,
-                jsonRequest
-            );
-
-            new LoginFetcher(getActivity()).execute(request);
+            Fetcher fetcher = new Fetcher(getActivity(), this);
+            fetcher.fetch(new Login(mEditLogin.getText().toString(), mEditPassword.getText().toString()));
         }
     }
 
-    private class LoginFetcher extends ApiFetcher {
-
-        public LoginFetcher(Activity activity) {
-            super(activity);
+    @Override
+    public void onResponse(Login.Model login) {
+        if (login.isSuccess()) {
+            Toast.makeText(getActivity(), R.string.notice_right_login, Toast.LENGTH_LONG).show();
+        } else {
+            Toast.makeText(getActivity(), login.getError(), Toast.LENGTH_LONG).show();
+            return;
         }
 
-        @Override
-        protected void uiExecute(Response response) throws JSONException {
-            JSONObject json = response.getJson();
-            if (json.getBoolean("isAuth")) {
-                Toast.makeText(getActivity(), R.string.notice_right_login, Toast.LENGTH_LONG).show();
-            } else {
-                Toast.makeText(getActivity(), R.string.notice_wrong_login, Toast.LENGTH_LONG).show();
-                return;
-            }
+        Session session = Session.getInstance(getActivity());
+        session.setSecret(login.getAuthSecret());
+        session.setAnketaId(login.getProfile().getId());
 
-            Session session = Session.getInstance(getActivity());
-            session.setSecret(json.getString("authSecret"));
-            session.setAnketaId(json.getJSONObject("profile").getInt("id"));
-
-            Intent intent = new Intent(getActivity(), ProfileActivity.class);
-            getActivity().startActivity(intent);
-        }
+        Intent intent = new Intent(getActivity(), ProfileActivity.class);
+        getActivity().startActivity(intent);
     }
-
 }
