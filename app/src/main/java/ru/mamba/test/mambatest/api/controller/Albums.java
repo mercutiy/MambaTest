@@ -13,7 +13,11 @@ import ru.mamba.test.mambatest.model.Album;
 
 public class Albums extends Controller<Albums.Model> {
 
-    protected final static String F_LST_ALBUMS = "albums";
+    private final static String F_LST_ALBUMS = "albums";
+
+    private final static String METHOD = Request.GET;
+
+    private final static String URI = "/users/%s/albums/";
 
     public Albums(int anketaId, boolean isPhotos, int limit) {
         HashMap<String, String> params = new HashMap<String, String>();
@@ -21,7 +25,7 @@ public class Albums extends Controller<Albums.Model> {
         if (limit != 0) {
             params.put("limit", String.valueOf(limit));
         }
-        setRequest(new Request("/users/" + String.valueOf(anketaId) + "/albums/", Request.GET, params));
+        setRequest(new Request(getUri(anketaId), METHOD, params));
     }
 
     @Override
@@ -50,4 +54,7 @@ public class Albums extends Controller<Albums.Model> {
         }
     }
 
+    protected String getUri(int anketaId) {
+         return String.format(URI, String.valueOf(anketaId));
+    }
 }

@@ -7,10 +7,14 @@ import ru.mamba.test.mambatest.api.Request;
 
 public class Profile extends Controller<Profile.Model> {
 
+    private final static String METHOD = Request.GET;
+
+    private final static String URI = "/profile/";
+
     private final static String F_OBJ_PROFILE = "anketa";
 
     public Profile() {
-        setRequest(new Request("/profile/", Request.GET));
+        setRequest(new Request(URI, METHOD));
     }
 
     @Override

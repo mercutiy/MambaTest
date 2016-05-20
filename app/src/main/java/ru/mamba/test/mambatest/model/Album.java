@@ -13,7 +13,7 @@ public class Album extends Model {
 
     protected final static String F_STR_TITLE = "name";
 
-    protected final static String F_STR_PHOTO = "photo";
+    protected final static String F_STR_PHOTO = "coverUrl";
 
     private int mId;
 

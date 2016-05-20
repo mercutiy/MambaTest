@@ -2,6 +2,7 @@ package ru.mamba.test.mambatest.api.controller;
 
 import android.util.Log;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -9,6 +10,10 @@ import ru.mamba.test.mambatest.api.Request;
 import ru.mamba.test.mambatest.model.Profile;
 
 public class Login extends Controller<Login.Model> {
+
+    private final static String METHOD = Request.POST;
+
+    private final static String URI = "/login/";
 
     private final static String F_STR_SECRET = "authSecret";
 
@@ -23,7 +28,7 @@ public class Login extends Controller<Login.Model> {
             Log.e(TAG, "json creating error", e);
             return;
         }
-        setRequest(new Request("/login/", Request.POST, null, jsonRequest));
+        setRequest(new Request(URI, METHOD, null, jsonRequest));
     }
 
     @Override

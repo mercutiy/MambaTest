@@ -61,8 +61,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, C
 
     private Button mContactButton;
 
-    private ProfileFetcher mFetcher;
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -90,115 +88,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, C
             new Folders()
         );
 
-        /*if (mFetcher == null) {
-            mFetcher = new ProfileFetcher(getActivity());
-            mFetcher.execute();
-        } else {
-            mFetcher.handleResponse();
-        }*/
-
         return view;
-    }
-
-    private class ProfileFetcher extends ApiFetcher implements Autharize {
-
-        public ProfileFetcher(Activity activity) {
-            super(activity);
-            int anketaId = Session.getInstance(activity).getAnketaId();
-            try {
-                JSONObject request = new JSONObject("{\"sysRequestsContainer\":[{\"method\":\"GET\", \"uri\":\"/profile/\", \"params\":{}}, {\"method\":\"GET\", \"uri\":\"/folders/\", \"params\":{}}, {\"method\":\"GET\", \"uri\":\"/users/" + String.valueOf(anketaId) + "/albums/\", \"params\":{}}]}");
-                setRequest(new Request("", Request.POST, null, request));
-            } catch (JSONException e) {
-                Log.e(TAG, "json creating error", e);
-            }
-        }
-
-
-        @Override
-        protected Response getResponse(Request request) throws FetchException {
-            Response response = super.getResponse(request);
-
-            try {
-                JSONObject json = response.getJson();
-
-                if (!json.getBoolean("isAuth")) {
-                    return response;
-                }
-
-                String photoSrc = json
-                    .getJSONArray("sysResponsesContainer")
-                    .getJSONObject(0)
-                    .getJSONObject("anketa")
-                    .getString("squarePhotoUrl");
-                Bitmap photo = new ImageFetcher().fetchImage(photoSrc);
-
-                ImageResponse imageResponse = new ImageResponse(response.getJson(), photo);
-                imageResponse.setPhoto(photo);
-
-                return imageResponse;
-
-            } catch (JSONException e) {
-                Log.e(TAG, "Error parsing json", e);
-                throw new JsonException();
-            }
-            catch (IOException e) {
-                Log.e(TAG, "IO error", e);
-                throw new ConnectionException();
-            }
-
-        }
-
-        @Override
-        protected void uiExecute(Response response) throws JSONException {
-            ImageResponse imageResponse = (ImageResponse)response;
-
-            JSONArray container = imageResponse.getJson().getJSONArray("sysResponsesContainer");
-
-            JSONObject anketa = container.getJSONObject(0).getJSONObject("anketa");
-
-            String name = anketa.getString("name");
-
-            int age = anketa.getInt("age");
-
-            String greeting = "";
-            if (anketa.has("aboutmeBlock") && !anketa.isNull("aboutmeBlock")) {
-                JSONObject aboutMeBlock = anketa.getJSONObject("aboutmeBlock");
-                JSONArray aboutMe = aboutMeBlock.getJSONArray("fields");
-                for (int i = 0; i < aboutMe.length(); i++) {
-                    JSONObject aboutmeItem = aboutMe.getJSONObject(i);
-                    if (aboutmeItem.getString("key").equals("aboutme")) {
-                        greeting = aboutmeItem.getString("value");
-                        break;
-                    }
-                }
-            }
-
-            String interests = "";
-            JSONArray jsonInterests = anketa.getJSONObject("interests").getJSONArray("items");
-            for (int i = 0; i < jsonInterests.length(); i++) {
-                interests = interests + jsonInterests.getJSONObject(i).getString("title") + " ";
-            }
-
-            mGreeting.setText(greeting);
-            mInterests.setText(interests);
-            mPhoto.setImageBitmap(imageResponse.getPhoto());
-
-            JSONObject folder = container.getJSONObject(1).getJSONArray("folders").getJSONObject(0);
-
-            int contacts = folder.getInt("count");
-            int albums = container.getJSONObject(2).getJSONArray("albums").length();
-
-            mAlbumButton.setText(getResources().getQuantityString(R.plurals.number_of_albums, albums, albums));
-            mContactButton.setText(getResources().getQuantityString(R.plurals.number_of_contacts, contacts, contacts));
-
-            ActionBar ab = ((AppCompatActivity)getActivity()).getSupportActionBar();
-            if (ab != null) {
-                String title = name + " " + String.valueOf(age) + " " + getResources().getString(R.string.string_its_you);
-                ab.setTitle(title);
-            }
-
-            Session.getInstance(getActivity()).setFolderId(folder.getInt("id"));
-        }
     }
 
     @Override

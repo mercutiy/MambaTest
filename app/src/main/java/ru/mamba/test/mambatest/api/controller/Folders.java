@@ -12,10 +12,14 @@ import ru.mamba.test.mambatest.model.Folder;
 
 public class Folders extends Controller<Folders.Model> {
 
-    protected final static String F_LST_FOLDERS = "folders";
+    private final static String F_LST_FOLDERS = "folders";
+
+    private final static String METHOD = Request.GET;
+
+    private final static String URI = "/folders/";
 
     public Folders() {
-        setRequest(new Request("/folders/"));
+        setRequest(new Request(URI, METHOD));
     }
 
     @Override

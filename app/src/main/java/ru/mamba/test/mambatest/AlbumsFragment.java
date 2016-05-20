@@ -157,12 +157,12 @@ public class AlbumsFragment extends Fragment implements AdapterView.OnItemClickL
             int albumsCount = albumsJson.length();
             for (int i = 0; i < albumsCount; i++) {
                 JSONObject albumJson = albumsJson.getJSONObject(i);
-                Album album = new Album(
+                /*Album album = new Album(
                     albumJson.getInt("id"),
                     albumJson.getString("name"),
                     albumJson.isNull("photos") ? null : albumJson.getJSONArray("photos").getJSONObject(0).getString("squarePhotoUrl")
                 );
-                mAlbumAdapter.add(album);
+                mAlbumAdapter.add(album);*/
             }
 
             ActionBar ab = ((AppCompatActivity)getActivity()).getSupportActionBar();

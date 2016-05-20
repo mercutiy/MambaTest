@@ -1,5 +1,6 @@
 package ru.mamba.test.mambatest.api;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.MalformedURLException;
@@ -84,5 +85,13 @@ public class Request {
 
     public String getRawPost() {
         return getPost().toString();
+    }
+
+    public JSONObject getRequestForBatch() throws JSONException {
+        JSONObject request = new JSONObject();
+        request.put("method", getMethod());
+        request.put("uri", getPath());
+        request.put("params", getPost() != null ? getPost() : new JSONObject());
+        return request;
     }
 }

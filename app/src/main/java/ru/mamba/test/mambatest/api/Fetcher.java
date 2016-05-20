@@ -59,7 +59,22 @@ public class Fetcher extends AsyncTask<Request, Void, Controller[]> {
     }
 
     private Request buildRequest(Controller[] controllers) {
-        return controllers[0].getRequest();
+        if (controllers.length == 1) {
+            return controllers[0].getRequest();
+        }
+
+        JSONObject batch = new JSONObject();
+        JSONArray container = new JSONArray();
+        try {
+            for (Controller controller: controllers) {
+                container.put(controller.getRequest().getRequestForBatch());
+            }
+            batch.put("sysRequestsContainer", container);
+        } catch (JSONException e) {
+            Log.e(TAG, "json creating error", e);
+        }
+
+        return new Request("/", Request.POST, null, batch);
     }
 
     private void saveResponses(String json) throws FetchException {
