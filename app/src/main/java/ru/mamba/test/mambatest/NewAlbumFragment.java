@@ -28,16 +28,28 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import ru.mamba.test.mambatest.api.Fetcher;
+import ru.mamba.test.mambatest.api.callback.Callback1;
+import ru.mamba.test.mambatest.api.controller.AlbumForm;
+import ru.mamba.test.mambatest.api.controller.AlbumNew;
+import ru.mamba.test.mambatest.api.controller.Albums;
+import ru.mamba.test.mambatest.api.controller.Controller;
+import ru.mamba.test.mambatest.api.response.FormBuilder;
 import ru.mamba.test.mambatest.fetcher.ApiFetcher;
 import ru.mamba.test.mambatest.fetcher.Autharize;
 import ru.mamba.test.mambatest.fetcher.Request;
 import ru.mamba.test.mambatest.fetcher.Response;
+import ru.mamba.test.mambatest.fetcher.Session;
 
-public class NewAlbumFragment extends Fragment {
+public class NewAlbumFragment extends Fragment implements Callback1<FormBuilder> {
 
     private LinearLayout mLayout;
 
     private FormFetcher mFetcher;
+
+    private Fetcher mFetcher2;
+
+    private FormBuilder mForm;
 
     public NewAlbumFragment() {
     }
@@ -61,12 +73,15 @@ public class NewAlbumFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_new_album, container, false);
         mLayout = (LinearLayout)view.findViewById(R.id.layout_form);
 
-        if (mFetcher == null) {
+        /*if (mFetcher == null) {
             mFetcher = new FormFetcher(getActivity());
             mFetcher.execute();
         } else {
             mFetcher.handleResponse();
-        }
+        }*/
+
+        mFetcher2 = new Fetcher(getActivity(), this);
+        mFetcher2.fetch(new AlbumForm());
 
         return view;
     }
@@ -75,9 +90,12 @@ public class NewAlbumFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_submit_album) {
             mLayout.removeAllViews();
-            JSONObject json = mFetcher.getNewRequest();
+            /*JSONObject json = mFetcher.getNewRequest();
             mFetcher = new FormFetcher(getActivity());
-            mFetcher.execute(new Request("/albums/", Request.POST, null, json));
+            mFetcher.execute(new Request("/albums/", Request.POST, null, json));*/
+            mFetcher2.fetch(new AlbumNew(mForm.getForm().getJson()));
+
+
             return true;
 
         }
@@ -265,5 +283,10 @@ public class NewAlbumFragment extends Fragment {
         public String toString() {
             return getValue();
         }
+    }
+
+    @Override
+    public void onResponse(FormBuilder form) {
+        mForm = form;
     }
 }

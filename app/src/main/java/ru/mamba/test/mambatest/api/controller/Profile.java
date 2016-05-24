@@ -1,9 +1,14 @@
 package ru.mamba.test.mambatest.api.controller;
 
+import android.graphics.Bitmap;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+
 import ru.mamba.test.mambatest.api.Request;
+import ru.mamba.test.mambatest.fetcher.ImageFetcher;
 
 public class Profile extends Controller<Profile.Model> {
 
@@ -36,6 +41,17 @@ public class Profile extends Controller<Profile.Model> {
 
         public void setProfile(ru.mamba.test.mambatest.model.Profile profile) {
             mProfile = profile;
+        }
+    }
+
+    @Override
+    protected void completeModel() {
+        super.completeModel();
+        try {
+            Bitmap photo = new ImageFetcher().fetchImage(getModel().getProfile().getPhotoSrc());
+            getModel().getProfile().setPhoto(photo);
+        } catch (IOException e) {
+
         }
     }
 }

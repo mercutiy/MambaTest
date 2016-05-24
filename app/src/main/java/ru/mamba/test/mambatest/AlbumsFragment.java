@@ -45,11 +45,8 @@ public class AlbumsFragment extends Fragment implements AdapterView.OnItemClickL
 
     private PhotoFetcher<Album> mPhotoFetcher;
 
-    private AlbumFetcher mFetcher;
-
     public AlbumsFragment() {
     }
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -58,10 +55,10 @@ public class AlbumsFragment extends Fragment implements AdapterView.OnItemClickL
         mPhotoFetcher.setListener(new PhotoFetcher.Listener<Album>() {
             @Override
             public void onPhotoDownloaded(Album album, Bitmap bitmap) {
-                album.setPhotoBitmap(bitmap);
-                if (isVisible()) {
-                    mAlbumAdapter.notifyDataSetChanged();
-                }
+            album.setPhotoBitmap(bitmap);
+            if (isVisible()) {
+                mAlbumAdapter.notifyDataSetChanged();
+            }
             }
         });
         mPhotoFetcher.start();
@@ -87,17 +84,9 @@ public class AlbumsFragment extends Fragment implements AdapterView.OnItemClickL
         View view = inflater.inflate(R.layout.fragment_albums, container, false);
 
         mAlbumAdapter = new AlbumAdapter(new ArrayList<Album>());
-
         ListView listView = (ListView)view.findViewById(R.id.list_view_albums);
         listView.setAdapter(mAlbumAdapter);
         listView.setOnItemClickListener(this);
-
-        if (mFetcher == null) {
-            mFetcher = new AlbumFetcher(getActivity());
-            mFetcher.execute();
-        } else {
-            mFetcher.handleResponse();
-        }
 
         Fetcher albumsFetcher = new Fetcher(getActivity(), this);
         Controller controller = new Albums(Session.getInstance(getActivity()).getAnketaId(), true, 1);
@@ -135,40 +124,6 @@ public class AlbumsFragment extends Fragment implements AdapterView.OnItemClickL
             }
 
             return convertView;
-        }
-    }
-
-    private class AlbumFetcher extends ApiFetcher implements Autharize {
-
-
-        public AlbumFetcher(Activity activity) {
-            super(activity);
-            HashMap<String, String> params = new HashMap<String, String>();
-            params.put("photos", "true");
-            params.put("limit", "1");
-            int anketaId = Session.getInstance(activity).getAnketaId();
-            setRequest(new Request("/users/" + String.valueOf(anketaId) + "/albums/", Request.GET, params));
-        }
-
-
-        @Override
-        protected void uiExecute(Response response) throws JSONException {
-            JSONArray albumsJson = response.getJson().getJSONArray("albums");
-            int albumsCount = albumsJson.length();
-            for (int i = 0; i < albumsCount; i++) {
-                JSONObject albumJson = albumsJson.getJSONObject(i);
-                /*Album album = new Album(
-                    albumJson.getInt("id"),
-                    albumJson.getString("name"),
-                    albumJson.isNull("photos") ? null : albumJson.getJSONArray("photos").getJSONObject(0).getString("squarePhotoUrl")
-                );
-                mAlbumAdapter.add(album);*/
-            }
-
-            ActionBar ab = ((AppCompatActivity)getActivity()).getSupportActionBar();
-            if (ab != null) {
-                ab.setTitle(getResources().getQuantityString(R.plurals.number_of_albums, albumsCount, albumsCount));
-            }
         }
     }
 

@@ -107,7 +107,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, C
     public void onResponse(Profile.Model profile, Albums.Model albums, Folders.Model folders) {
         mGreeting.setText(profile.getProfile().getGreeting());
         mInterests.setText(StringUtils.join(profile.getProfile().getInterests(), " "));
-        //mPhoto.setImageBitmap(profile.getProfile().getPhoto());
+        mPhoto.setImageBitmap(profile.getProfile().getPhoto());
         mAlbumButton.setText(getResources().getQuantityString(R.plurals.number_of_albums, albums.getAlbums().length, albums.getAlbums().length));
         Folder folder = folders.getFolders()[0];
         mContactButton.setText(getResources().getQuantityString(R.plurals.number_of_contacts, folder.getContactCount(), folder.getContactCount()));

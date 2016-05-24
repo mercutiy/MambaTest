@@ -36,7 +36,8 @@ public abstract class Controller<Model> {
     public void setResponse(Response response) {
         mResponse = response;
         try {
-            mModel = parseResponse(response.getJson());
+            setModel(parseResponse(response.getJson()));
+            completeModel();
         } catch (JSONException e) {
             Log.e(TAG, "unpredictable json", e);
             mResponse.setException(e);
@@ -45,5 +46,13 @@ public abstract class Controller<Model> {
 
     public Model getModel() {
         return mModel;
+    }
+
+    public void setModel(Model model) {
+        mModel = model;
+    }
+
+    protected void completeModel() {
+
     }
 }
