@@ -8,12 +8,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ru.mamba.test.mambatest.model.form.Block;
+import ru.mamba.test.mambatest.model.form.Field;
 
 public class Form extends Model {
 
     private final static String F_LST_BLOCKS = "blocks";
 
-    private Block[] mBlock;
+    private Block[] mBlocks;
 
     public Form(JSONObject json) throws JSONException {
         super(json);
@@ -23,18 +24,33 @@ public class Form extends Model {
             blocks.add(new Block(jsonBlocks.getJSONObject(i)));
         }
 
-        setBlock(blocks.toArray(new Block[blocks.size()]));
+        setBlocks(blocks.toArray(new Block[blocks.size()]));
     }
 
-    public Block[] getBlock() {
-        return mBlock;
+    public Block[] getBlocks() {
+        return mBlocks;
     }
 
-    public void setBlock(Block[] block) {
-        mBlock = block;
+    public void setBlocks(Block[] block) {
+        mBlocks = block;
     }
 
     public JSONObject getJson() {
-        return new JSONObject();
+        JSONObject response = new JSONObject();
+
+        for (Block block : getBlocks()) {
+            try {
+                JSONObject jsonBlock = new JSONObject();
+                for (Field field : block.getFields()) {
+                    field.actualize();
+                    jsonBlock.put(field.getField(), field.getValue());
+                }
+                response.put(block.getField(), jsonBlock);
+            } catch (JSONException e) {
+                // todo сделать что-то
+            }
+        }
+
+        return response;
     }
 }

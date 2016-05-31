@@ -40,16 +40,21 @@ import ru.mamba.test.mambatest.fetcher.Autharize;
 import ru.mamba.test.mambatest.fetcher.Request;
 import ru.mamba.test.mambatest.fetcher.Response;
 import ru.mamba.test.mambatest.fetcher.Session;
+import ru.mamba.test.mambatest.model.form.Block;
+import ru.mamba.test.mambatest.model.form.Field;
+import ru.mamba.test.mambatest.model.form.SingleSelect;
+import ru.mamba.test.mambatest.model.form.Switcher;
+import ru.mamba.test.mambatest.model.form.Text;
 
 public class NewAlbumFragment extends Fragment implements Callback1<FormBuilder> {
 
     private LinearLayout mLayout;
 
-    private FormFetcher mFetcher;
+    //private FormFetcher mFetcher;
 
     private Fetcher mFetcher2;
 
-    private FormBuilder mForm;
+    private FormBuilder mFormBuilder;
 
     public NewAlbumFragment() {
     }
@@ -93,7 +98,7 @@ public class NewAlbumFragment extends Fragment implements Callback1<FormBuilder>
             /*JSONObject json = mFetcher.getNewRequest();
             mFetcher = new FormFetcher(getActivity());
             mFetcher.execute(new Request("/albums/", Request.POST, null, json));*/
-            mFetcher2.fetch(new AlbumNew(mForm.getForm().getJson()));
+            mFetcher2.fetch(new AlbumNew(mFormBuilder.getForm().getJson()));
 
 
             return true;
@@ -102,6 +107,7 @@ public class NewAlbumFragment extends Fragment implements Callback1<FormBuilder>
         return super.onOptionsItemSelected(item);
     }
 
+    /*
     private class FormFetcher extends ApiFetcher implements Autharize {
 
         private LayoutInflater mInflater;
@@ -283,10 +289,103 @@ public class NewAlbumFragment extends Fragment implements Callback1<FormBuilder>
         public String toString() {
             return getValue();
         }
-    }
+    }*/
 
     @Override
-    public void onResponse(FormBuilder form) {
-        mForm = form;
+    public void onResponse(FormBuilder formBuilder) {
+        View[] views = new FormBuilderDrawer(getLayoutInflater(new Bundle()), formBuilder).getViews();
+        for (View view : views) {
+            mLayout.addView(view);
+        }
     }
+
+
+    public class FormBuilderDrawer {
+
+        private LayoutInflater mInflater;
+
+        private FormBuilder mFromBuilder;
+
+        public FormBuilderDrawer(LayoutInflater inflater, FormBuilder fromBuilder) {
+            mInflater = inflater;
+            mFromBuilder = fromBuilder;
+        }
+
+        public View[] getViews() {
+            List<View> views = new ArrayList<View>();
+            for (Block block : mFormBuilder.getForm().getBlocks()) {
+                views.add(getBlockView(block));
+                for (Field field : block.getFields()) {
+                    if (field instanceof Text) {
+                        views.add(getTextView((Text)field));
+                    } else if (field instanceof Switcher) {
+                        views.add(getSwitcherView((Switcher)field));
+                    } else if (field instanceof SingleSelect) {
+                        views.add(getSingleSelectView((SingleSelect)field));
+                    }
+                }
+            }
+
+            return views.toArray(new View[views.size()]);
+        }
+
+        private View getBlockView(Block block) {
+            View fbBlock = mInflater.inflate(R.layout.fb_block, null);
+            ((TextView)fbBlock.findViewById(R.id.fb_block_title)).setText(block.getTitle());
+            if (block.getError() != null) {
+                TextView error = (TextView)fbBlock.findViewById(R.id.fb_block_error);
+                error.setText(block.getError());
+                error.setVisibility(View.VISIBLE);
+            }
+
+            return fbBlock;
+        }
+
+        private View getTextView(Text text) {
+            View fbText = mInflater.inflate(R.layout.fb_text, null);
+
+            ((TextView)fbText.findViewById(R.id.fb_text_title)).setText(text.getTitle());
+            EditText edit = (EditText)fbText.findViewById(R.id.fb_text_edit);
+            edit.setText(text.getValue());
+            if (text.getError() != null) {
+                TextView error = (TextView)fbText.findViewById(R.id.fb_text_error);
+                error.setText(text.getError());
+                error.setVisibility(View.VISIBLE);
+            }
+            text.setView(fbText);
+            // TODO Добавить поддержку desc (описание) во все поля
+
+            return fbText;
+        }
+
+        private View getSingleSelectView(SingleSelect singleSelect) {
+            View fbSS = mInflater.inflate(R.layout.fb_single_select, null);
+
+            ((TextView)fbSS.findViewById(R.id.fb_ss_title)).setText(singleSelect.getTitle());
+            Spinner spinner = (Spinner)fbSS.findViewById(R.id.fb_ss_spinner);
+            ArrayAdapter<SingleSelect.Item> adapter = new ArrayAdapter<SingleSelect.Item>(
+                getActivity().getApplicationContext(),
+                R.layout.fb_single_select_item,
+                singleSelect.getVariants()
+            );
+            spinner.setAdapter(adapter);
+            singleSelect.setView(spinner);
+            // TODO Добавить поддержку desc (описание) во все поля
+
+            return fbSS;
+        }
+
+        private View getSwitcherView(Switcher switcher) {
+            View fbSwitcher = mInflater.inflate(R.layout.fb_switcher, null);
+
+            Switch switchView = (Switch)fbSwitcher.findViewById(R.id.fb_switcher);
+            switchView.setText(switcher.getTitle());
+            switchView.setChecked(switcher.getValue());
+            switcher.setView(switchView);
+            // TODO Добавить поддержку desc (описание) во все поля
+
+            return fbSwitcher;
+        }
+    }
+
 }

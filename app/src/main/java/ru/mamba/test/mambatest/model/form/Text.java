@@ -1,5 +1,7 @@
 package ru.mamba.test.mambatest.model.form;
 
+import android.widget.TextView;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -20,5 +22,10 @@ public class Text extends Field {
 
     public void setValue(String value) {
         mValue = value;
+    }
+
+    @Override
+    public void actualize() {
+        setValue(((TextView)getView()).getText().toString());
     }
 }

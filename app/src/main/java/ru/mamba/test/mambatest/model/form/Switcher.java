@@ -1,5 +1,7 @@
 package ru.mamba.test.mambatest.model.form;
 
+import android.widget.Switch;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -14,7 +16,7 @@ public class Switcher extends Field {
         setValue(json.getBoolean(F_BOOL_VALUE));
     }
 
-    public boolean isValue() {
+    public Boolean getValue() {
         return mValue;
     }
 
@@ -22,4 +24,8 @@ public class Switcher extends Field {
         mValue = value;
     }
 
+    @Override
+    public void actualize() {
+        setValue(((Switch)getView()).isChecked());
+    }
 }

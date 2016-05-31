@@ -17,11 +17,15 @@ public class Block extends Model {
 
     private final static String F_LST_FIELDS = "fields";
 
+    private final static String F_STR_FIELD = "field";
+
     private String mTitle;
 
     private String mError;
 
     private Field[] mFields;
+
+    private String mField;
 
     public Block(JSONObject json) throws JSONException {
         super(json);
@@ -35,6 +39,7 @@ public class Block extends Model {
             fields.add(new Field(jsonFields.getJSONObject(i)));
         }
         setFields(fields.toArray(new Field[fields.size()]));
+        setField(json.getString(F_STR_FIELD));
     }
 
     public String getTitle() {
@@ -59,5 +64,13 @@ public class Block extends Model {
 
     public void setFields(Field[] fields) {
         mFields = fields;
+    }
+
+    public String getField() {
+        return mField;
+    }
+
+    public void setField(String field) {
+        mField = field;
     }
 }

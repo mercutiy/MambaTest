@@ -1,5 +1,7 @@
 package ru.mamba.test.mambatest.model.form;
 
+import android.view.View;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -31,6 +33,8 @@ public class Field extends Model {
 
     private String mDescription;
 
+    private View mView;
+
     public Field(JSONObject json) throws JSONException {
         super(json);
         setTitle(json.getString(F_STR_TITLE));
@@ -53,6 +57,7 @@ public class Field extends Model {
             case TYPE_SWITCHER:
                 return new Switcher(json);
             default:
+                // todo придумать че-то поумнее
                 return new Field(json);
         }
     }
@@ -87,5 +92,21 @@ public class Field extends Model {
 
     public void setDescription(String description) {
         mDescription = description;
+    }
+
+    public Object getValue() {
+        return "";
+    }
+
+    public void setView(View view) {
+        mView = view;
+    }
+
+    public View getView() {
+        return mView;
+    }
+
+    public void actualize() {
+
     }
 }
