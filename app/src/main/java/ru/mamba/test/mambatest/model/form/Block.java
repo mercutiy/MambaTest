@@ -36,7 +36,7 @@ public class Block extends Model {
         List<Field> fields = new ArrayList<Field>();
         JSONArray jsonFields = json.getJSONArray(F_LST_FIELDS);
         for (int i = 0; i < jsonFields.length(); i++) {
-            fields.add(new Field(jsonFields.getJSONObject(i)));
+            fields.add(Field.getField(jsonFields.getJSONObject(i)));
         }
         setFields(fields.toArray(new Field[fields.size()]));
         setField(json.getString(F_STR_FIELD));

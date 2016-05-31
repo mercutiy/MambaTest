@@ -1,22 +1,20 @@
 package ru.mamba.test.mambatest.model.form;
 
-import android.util.ArrayMap;
 import android.widget.Spinner;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class SingleSelect extends Field {
 
     private static final String F_OBJ_VARIANTS = "variants";
 
-    private static final String F_STR_KEY = "variants";
+    private static final String F_STR_KEY = "key";
 
-    private static final String F_STR_VALUE = "variants";
+    private static final String F_STR_VALUE = "name";
+
+    private static final String F_BOOL_SELECTED = "selected";
 
     private Item[] mVariants;
 
