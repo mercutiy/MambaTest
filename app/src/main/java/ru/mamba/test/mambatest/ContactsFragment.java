@@ -1,6 +1,5 @@
 package ru.mamba.test.mambatest;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -19,29 +18,16 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import ru.mamba.test.mambatest.api.Fetcher;
 import ru.mamba.test.mambatest.api.callback.Callback1;
 import ru.mamba.test.mambatest.api.controller.Contacts;
-import ru.mamba.test.mambatest.fetcher.ApiFetcher;
-import ru.mamba.test.mambatest.fetcher.Autharize;
-import ru.mamba.test.mambatest.fetcher.ImageFetcher;
 import ru.mamba.test.mambatest.fetcher.PhotoFetcher;
-import ru.mamba.test.mambatest.fetcher.Request;
-import ru.mamba.test.mambatest.fetcher.Response;
 import ru.mamba.test.mambatest.fetcher.Session;
 import ru.mamba.test.mambatest.model.Anketa;
 import ru.mamba.test.mambatest.model.Contact;
 
-/**
- * A placeholder fragment containing a simple view.
- */
 public class ContactsFragment
     extends Fragment
     implements AdapterView.OnItemClickListener, AbsListView.OnScrollListener, Callback1<Contacts.Model>
@@ -54,8 +40,6 @@ public class ContactsFragment
     int mTotal = -1;
 
     int mCurrentTotal = -1;
-
-    ListView mListView;
 
     int mFolderId;
 
@@ -152,54 +136,6 @@ public class ContactsFragment
             return convertView;
         }
     }
-
-    /*private class ContactFetcher extends ApiFetcher implements Autharize {
-
-        public ContactFetcher(Activity activity) {
-            super(activity);
-        }
-
-        @Override
-        protected void uiExecute(Response response) throws JSONException {
-
-            JSONObject json = response.getJson();
-
-            int contactsCount = json.getJSONObject("folder").getInt("count");
-
-            JSONArray contactsJson = json.getJSONArray("contacts");
-
-            for (int i = 0; i < contactsJson.length(); i++) {
-                JSONObject contactJson = contactsJson.getJSONObject(i);
-                JSONObject anketaJson = contactJson.getJSONObject("anketa");
-                Contact contact = new Contact(
-                    contactJson.getInt("contactId"),
-                    anketaJson.getInt("id"),
-                    anketaJson.getString("name"),
-                    contactJson.getInt("messages")
-                );
-
-                if (anketaJson.has("deleted")) {
-                    contact.setDeleted(anketaJson.getBoolean("deleted"));
-                }
-
-                if (!contact.isDeleted()) {
-                    contact.setAge(anketaJson.getInt("age"));
-                    contact.setPhoto(anketaJson.getString("squarePhotoUrl"));
-                }
-
-                mContactAdapter.add(contact);
-            }
-
-            if (mTotal == -1) {
-                mTotal = contactsCount;
-            }
-
-            ActionBar ab = ((AppCompatActivity)getActivity()).getSupportActionBar();
-            if (ab != null) {
-                ab.setTitle(getResources().getQuantityString(R.plurals.number_of_contacts, contactsCount, contactsCount));
-            }
-        }
-    }*/
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {

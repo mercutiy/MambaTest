@@ -1,10 +1,8 @@
 package ru.mamba.test.mambatest;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,20 +10,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import ru.mamba.test.mambatest.api.Fetcher;
 import ru.mamba.test.mambatest.api.callback.Callback1;
 import ru.mamba.test.mambatest.api.controller.Login;
-import ru.mamba.test.mambatest.fetcher.ApiFetcher;
-import ru.mamba.test.mambatest.fetcher.Request;
-import ru.mamba.test.mambatest.fetcher.Response;
 import ru.mamba.test.mambatest.fetcher.Session;
 
-/**
- * A placeholder fragment containing a simple view.
- */
 public class LoginFragment extends Fragment implements View.OnClickListener, Callback1<Login.Model> {
 
     Button mLoginButton;
