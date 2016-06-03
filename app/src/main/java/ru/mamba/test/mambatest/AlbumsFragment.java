@@ -36,9 +36,6 @@ import ru.mamba.test.mambatest.fetcher.Response;
 import ru.mamba.test.mambatest.fetcher.Session;
 import ru.mamba.test.mambatest.model.Album;
 
-/**
- * A placeholder fragment containing a simple view.
- */
 public class AlbumsFragment extends Fragment implements AdapterView.OnItemClickListener, Callback1<Albums.Model> {
 
     private AlbumAdapter mAlbumAdapter;

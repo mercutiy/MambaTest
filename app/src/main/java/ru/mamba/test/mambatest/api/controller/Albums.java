@@ -17,7 +17,7 @@ public class Albums extends Controller<Albums.Model> {
 
     private final static String METHOD = Request.GET;
 
-    private final static String URI = "/users/%s/albums/";
+    private final static String URI = "/users/%d/albums/";
 
     public Albums(int anketaId, boolean isPhotos, int limit) {
         HashMap<String, String> params = new HashMap<String, String>();
@@ -55,6 +55,6 @@ public class Albums extends Controller<Albums.Model> {
     }
 
     protected String getUri(int anketaId) {
-         return String.format(URI, String.valueOf(anketaId));
+         return String.format(URI, anketaId);
     }
 }

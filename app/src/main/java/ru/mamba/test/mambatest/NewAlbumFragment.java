@@ -71,6 +71,7 @@ public class NewAlbumFragment extends Fragment implements Callback1<FormBuilder>
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_submit_album) {
             mLayout.removeAllViews();
+            mFetcher = new Fetcher(getActivity(), this);
             mFetcher.fetch(new AlbumNew(mFormBuilder.getForm().getJson()));
             return true;
 
@@ -147,7 +148,7 @@ public class NewAlbumFragment extends Fragment implements Callback1<FormBuilder>
                 error.setText(text.getError());
                 error.setVisibility(View.VISIBLE);
             }
-            text.setView(fbText);
+            text.setView(edit);
             // TODO Добавить поддержку desc (описание) во все поля
 
             return fbText;

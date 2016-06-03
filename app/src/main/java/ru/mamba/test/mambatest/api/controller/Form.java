@@ -17,7 +17,9 @@ public abstract class Form extends Controller<FormBuilder> {
         if (json.has(F_STR_MESSAGE)) {
             response.setMessage(json.getString(F_STR_MESSAGE));
         }
-        response.setForm(new ru.mamba.test.mambatest.model.Form(json.getJSONObject(F_OBJ_FORM)));
+        if (json.has(F_OBJ_FORM)) {
+            response.setForm(new ru.mamba.test.mambatest.model.Form(json.getJSONObject(F_OBJ_FORM)));
+        }
 
         return response;
     }

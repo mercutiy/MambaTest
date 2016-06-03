@@ -1,77 +1,50 @@
 package ru.mamba.test.mambatest.model;
 
-import android.graphics.Bitmap;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-public class Contact {
+public class Contact extends Model {
+
+    private final static String F_INT_ID = "contactId";
+
+    private final static String F_INT_MESSAGES = "messages";
+
+    private final static String F_OBJ_ANKETA = "anketa";
 
     private int mId;
 
-    private int mAnketaId;
-
-    private String mName;
-
-    private int mAge;
-
-    private String mPhoto;
-
-    private Bitmap mProtoBitmap;
-
-    private boolean mDeleted = false;
-
     private int mMessages;
 
-    public Contact(int id, int anketaId, String name, int messages) {
-        mId = id;
-        mAnketaId = anketaId;
-        mName = name;
-        mMessages = messages;
+    private Anketa mAnketa;
+
+    public Contact(JSONObject json) throws JSONException {
+        super(json);
+        setId(json.getInt(F_INT_ID));
+        setId(json.getInt(F_INT_MESSAGES));
+        setAnketa(new Anketa(json.getJSONObject(F_OBJ_ANKETA)));
     }
 
     public int getId() {
         return mId;
     }
 
-    public int getAnketaId() {
-        return mAnketaId;
-    }
-
-    public String getName() {
-        return mName;
-    }
-
-    public int getAge() {
-        return mAge;
-    }
-
-    public String getPhoto() {
-        return mPhoto;
-    }
-
     public int getMessages() {
         return mMessages;
     }
 
-    public void setAge(int age) {
-        mAge = age;
+    public void setId(int id) {
+        mId = id;
     }
 
-    public void setPhoto(String photo) {
-        mPhoto = photo;
+    public void setMessages(int messages) {
+        mMessages = messages;
     }
 
-    public boolean isDeleted() {
-        return mDeleted;
+    public Anketa getAnketa() {
+        return mAnketa;
     }
 
-    public void setDeleted(boolean deleted) {
-        mDeleted = deleted;
-    }
-
-    public Bitmap getProtoBitmap() {
-        return mProtoBitmap;
-    }
-
-    public void setProtoBitmap(Bitmap protoBitmap) {
-        mProtoBitmap = protoBitmap;
+    public void setAnketa(Anketa anketa) {
+        mAnketa = anketa;
     }
 }

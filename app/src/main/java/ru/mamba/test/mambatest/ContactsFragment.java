@@ -26,6 +26,9 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import ru.mamba.test.mambatest.api.Fetcher;
+import ru.mamba.test.mambatest.api.callback.Callback1;
+import ru.mamba.test.mambatest.api.controller.Contacts;
 import ru.mamba.test.mambatest.fetcher.ApiFetcher;
 import ru.mamba.test.mambatest.fetcher.Autharize;
 import ru.mamba.test.mambatest.fetcher.ImageFetcher;
@@ -33,16 +36,20 @@ import ru.mamba.test.mambatest.fetcher.PhotoFetcher;
 import ru.mamba.test.mambatest.fetcher.Request;
 import ru.mamba.test.mambatest.fetcher.Response;
 import ru.mamba.test.mambatest.fetcher.Session;
+import ru.mamba.test.mambatest.model.Anketa;
 import ru.mamba.test.mambatest.model.Contact;
 
 /**
  * A placeholder fragment containing a simple view.
  */
-public class ContactsFragment extends Fragment implements AdapterView.OnItemClickListener, AbsListView.OnScrollListener {
+public class ContactsFragment
+    extends Fragment
+    implements AdapterView.OnItemClickListener, AbsListView.OnScrollListener, Callback1<Contacts.Model>
+{
 
     private ContactAdapter mContactAdapter;
 
-    private PhotoFetcher<Contact> mPhotoFetcher;
+    private PhotoFetcher<Anketa> mPhotoFetcher;
 
     int mTotal = -1;
 
@@ -50,18 +57,21 @@ public class ContactsFragment extends Fragment implements AdapterView.OnItemClic
 
     ListView mListView;
 
+    int mFolderId;
+
+    private Fetcher mFetcher;
+
     public ContactsFragment() {
     }
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mPhotoFetcher = new PhotoFetcher<Contact>(new Handler());
-        mPhotoFetcher.setListener(new PhotoFetcher.Listener<Contact>() {
+        mPhotoFetcher = new PhotoFetcher<Anketa>(new Handler());
+        mPhotoFetcher.setListener(new PhotoFetcher.Listener<Anketa>() {
             @Override
-            public void onPhotoDownloaded(Contact contact, Bitmap bitmap) {
-                contact.setProtoBitmap(bitmap);
+            public void onPhotoDownloaded(Anketa anketa, Bitmap bitmap) {
+                anketa.setPhoto(bitmap);
                 if (isVisible()) {
                     mContactAdapter.notifyDataSetChanged();
                 }
@@ -69,6 +79,9 @@ public class ContactsFragment extends Fragment implements AdapterView.OnItemClic
         });
         mPhotoFetcher.start();
         mPhotoFetcher.getLooper();
+
+        mFolderId = Session.getInstance(getActivity()).getFolderId();
+        mFetcher = new Fetcher(getActivity(), this);
 
         setHasOptionsMenu(true);
         setRetainInstance(true);
@@ -121,25 +134,26 @@ public class ContactsFragment extends Fragment implements AdapterView.OnItemClic
             TextView messagesView = (TextView)convertView.findViewById(R.id.text_view_contact_messages);
 
             // TODO Заменить конкатеницию
-            nameAgeView.setText(contact.getName() + ", " + String.valueOf(contact.getAge()));
+            nameAgeView.setText(contact.getAnketa().getName() + ", " + String.valueOf(contact.getAnketa().getAge()));
             messagesView.setText(getResources().getQuantityString(R.plurals.number_of_messages, contact.getMessages(), contact.getMessages()));
 
             Bitmap noPhoto = BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.nophoto);
             ImageView imageView = (ImageView)convertView.findViewById(R.id.image_view_contact_photo);
 
-            if (contact.getPhoto() == null || "".equals(contact.getPhoto())) {
+            Anketa anketa = contact.getAnketa();
+            if (anketa.getPhotoSrc() == null || "".equals(anketa.getPhotoSrc())) {
                 imageView.setImageBitmap(noPhoto);
-            } else if (contact.getProtoBitmap() != null) {
-                imageView.setImageBitmap(contact.getProtoBitmap());
+            } else if (anketa.getPhoto() != null) {
+                imageView.setImageBitmap(anketa.getPhoto());
             } else {
-                mPhotoFetcher.queueThumbnail(contact, contact.getPhoto());
+                mPhotoFetcher.queueThumbnail(anketa, anketa.getPhotoSrc());
             }
 
             return convertView;
         }
     }
 
-    private class ContactFetcher extends ApiFetcher implements Autharize {
+    /*private class ContactFetcher extends ApiFetcher implements Autharize {
 
         public ContactFetcher(Activity activity) {
             super(activity);
@@ -185,17 +199,17 @@ public class ContactsFragment extends Fragment implements AdapterView.OnItemClic
                 ab.setTitle(getResources().getQuantityString(R.plurals.number_of_contacts, contactsCount, contactsCount));
             }
         }
-    }
+    }*/
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Contact contact = (Contact)mContactAdapter.getItem(position);
-        if (contact.isDeleted()) {
+        if (contact.getAnketa().isDeleted()) {
             return;
         }
 
         Intent intent = new Intent(getActivity(), AnketaActivity.class);
-        intent.putExtra(AnketaActivity.EXTRA_ANKETA_ID, contact.getAnketaId());
+        intent.putExtra(AnketaActivity.EXTRA_ANKETA_ID, contact.getAnketa().getId());
         startActivity(intent);
     }
 
@@ -212,13 +226,26 @@ public class ContactsFragment extends Fragment implements AdapterView.OnItemClic
             (totalItemCount >= mCurrentTotal && mCurrentTotal + limit <= mTotal) || mCurrentTotal == -1
         ) {
             mCurrentTotal = totalItemCount + limit;
+            mFetcher = new Fetcher(getActivity(), this);
+            mFetcher.fetch(new Contacts(mFolderId, totalItemCount, 10));
+        }
+    }
 
-            ContactFetcher contactFetcher = new ContactFetcher(getActivity());
-            HashMap<String, String> params = new HashMap<String, String>();
-            params.put("limit", "10");
-            params.put("offset", String.valueOf(totalItemCount));
-            int folderId = Session.getInstance(getActivity()).getFolderId();
-            contactFetcher.execute(new Request("/folders/" + String.valueOf(folderId) + "/contacts/", Request.GET, params));
+    @Override
+    public void onResponse(Contacts.Model model) {
+        int contactsCount = model.getContactCount();
+
+        for (Contact contact : model.getContacts()) {
+            mContactAdapter.add(contact);
+        }
+
+        if (mTotal == -1) {
+            mTotal = contactsCount;
+        }
+
+        ActionBar ab = ((AppCompatActivity)getActivity()).getSupportActionBar();
+        if (ab != null) {
+            ab.setTitle(getResources().getQuantityString(R.plurals.number_of_contacts, contactsCount, contactsCount));
         }
     }
 }
