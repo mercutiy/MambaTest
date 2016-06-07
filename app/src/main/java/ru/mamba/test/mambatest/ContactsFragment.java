@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import ru.mamba.test.mambatest.api.Fetcher;
 import ru.mamba.test.mambatest.api.callback.Callback1;
 import ru.mamba.test.mambatest.api.controller.Contacts;
-import ru.mamba.test.mambatest.fetcher.PhotoFetcher;
+import ru.mamba.test.mambatest.api.image.PhotoFetcher;
 import ru.mamba.test.mambatest.api.Session;
 import ru.mamba.test.mambatest.model.Anketa;
 import ru.mamba.test.mambatest.model.Contact;

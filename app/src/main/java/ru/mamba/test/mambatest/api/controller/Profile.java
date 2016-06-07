@@ -7,9 +7,8 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 
-import ru.mamba.test.mambatest.api.Authorise;
 import ru.mamba.test.mambatest.api.Request;
-import ru.mamba.test.mambatest.fetcher.ImageFetcher;
+import ru.mamba.test.mambatest.api.image.ImageFetcher;
 
 public class Profile extends Controller<Profile.Model> implements Authorise {
 
