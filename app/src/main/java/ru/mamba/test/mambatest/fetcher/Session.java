@@ -48,7 +48,7 @@ public class Session {
         return mSid;
     }
 
-    private void setSid(String sid) {
+    public void setSid(String sid) {
         if (!sid.equals(getSid())) {
             mPreferences.edit().putString(PREF_FIELD_SID, sid).apply();
             mSid = sid;

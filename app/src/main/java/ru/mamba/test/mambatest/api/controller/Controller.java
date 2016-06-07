@@ -6,8 +6,10 @@ import android.widget.TableRow;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import ru.mamba.test.mambatest.api.Authorise;
 import ru.mamba.test.mambatest.api.Request;
 import ru.mamba.test.mambatest.api.Response;
+import ru.mamba.test.mambatest.api.exception.NotAuthException;
 
 public abstract class Controller<Model> {
 
@@ -33,9 +35,12 @@ public abstract class Controller<Model> {
         mRequest = request;
     }
 
-    public void setResponse(Response response) {
+    public void setResponse(Response response) throws NotAuthException {
         mResponse = response;
         try {
+            if (this instanceof Authorise && !response.getJson().getBoolean(F_BOOL_AUTH)) {
+                throw new NotAuthException();
+            }
             setModel(parseResponse(response.getJson()));
             completeModel();
         } catch (JSONException e) {

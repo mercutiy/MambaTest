@@ -3,6 +3,7 @@ package ru.mamba.test.mambatest.api;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -19,6 +20,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 
+import ru.mamba.test.mambatest.LoginActivity;
 import ru.mamba.test.mambatest.R;
 import ru.mamba.test.mambatest.api.callback.Callback;
 import ru.mamba.test.mambatest.api.callback.Callback1;
@@ -26,6 +28,7 @@ import ru.mamba.test.mambatest.api.callback.Callback2;
 import ru.mamba.test.mambatest.api.callback.Callback3;
 import ru.mamba.test.mambatest.api.controller.Controller;
 
+import ru.mamba.test.mambatest.api.exception.NotAuthException;
 import ru.mamba.test.mambatest.fetcher.ApiException;
 import ru.mamba.test.mambatest.fetcher.ConnectionException;
 import ru.mamba.test.mambatest.fetcher.FetchException;
@@ -46,6 +49,8 @@ public class Fetcher extends AsyncTask<Request, Void, Controller[]> {
     private Controller[] mControllers;
 
     private ProgressDialog mDialog;
+
+    private boolean mReauthorise = false;
 
     public Fetcher(Activity activity, Callback callback) {
         mActivity = activity;
@@ -91,6 +96,8 @@ public class Fetcher extends AsyncTask<Request, Void, Controller[]> {
         } catch (JSONException e) {
             Log.e(TAG, "Error parsing json", e);
             throw new JsonException();
+        } catch (NotAuthException e) {
+            mReauthorise = true;
         }
     }
 
@@ -116,6 +123,12 @@ public class Fetcher extends AsyncTask<Request, Void, Controller[]> {
     @Override
     protected void onPostExecute(Controller[] controllers) {
         mDialog.dismiss();
+        if (mReauthorise) {
+            getSession().setSid("");
+            Intent intent = new Intent(getActivity(), LoginActivity.class);
+            getActivity().startActivity(intent);
+            return;
+        }
         if (mControllers.length == 1 && mCallback instanceof Callback1) {
             ((Callback1)mCallback).onResponse(mControllers[0].getModel());
         } else if (mControllers.length == 2 && mCallback instanceof Callback2) {

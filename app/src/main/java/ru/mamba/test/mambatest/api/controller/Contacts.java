@@ -8,10 +8,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import ru.mamba.test.mambatest.api.Authorise;
 import ru.mamba.test.mambatest.api.Request;
 import ru.mamba.test.mambatest.model.Contact;
 
-public class Contacts extends Controller<Contacts.Model> {
+public class Contacts extends Controller<Contacts.Model> implements Authorise {
 
 
     private final static String METHOD = Request.GET;

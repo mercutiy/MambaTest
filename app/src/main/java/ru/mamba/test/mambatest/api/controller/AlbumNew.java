@@ -2,9 +2,10 @@ package ru.mamba.test.mambatest.api.controller;
 
 import org.json.JSONObject;
 
+import ru.mamba.test.mambatest.api.Authorise;
 import ru.mamba.test.mambatest.api.Request;
 
-public class AlbumNew extends Form {
+public class AlbumNew extends Form implements Authorise {
 
     private final static String METHOD = Request.POST;
 

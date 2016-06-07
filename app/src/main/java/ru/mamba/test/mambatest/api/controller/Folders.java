@@ -7,10 +7,11 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import ru.mamba.test.mambatest.api.Authorise;
 import ru.mamba.test.mambatest.api.Request;
 import ru.mamba.test.mambatest.model.Folder;
 
-public class Folders extends Controller<Folders.Model> {
+public class Folders extends Controller<Folders.Model> implements Authorise {
 
     private final static String F_LST_FOLDERS = "folders";
 

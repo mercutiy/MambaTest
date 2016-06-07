@@ -1,8 +1,9 @@
 package ru.mamba.test.mambatest.api.controller;
 
+import ru.mamba.test.mambatest.api.Authorise;
 import ru.mamba.test.mambatest.api.Request;
 
-public class AlbumForm extends Form {
+public class AlbumForm extends Form implements Authorise {
 
     private final static String METHOD = Request.GET;
 
