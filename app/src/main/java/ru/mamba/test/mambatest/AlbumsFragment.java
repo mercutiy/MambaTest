@@ -23,7 +23,7 @@ import ru.mamba.test.mambatest.api.controller.Albums;
 import ru.mamba.test.mambatest.api.controller.Controller;
 import ru.mamba.test.mambatest.api.Fetcher;
 import ru.mamba.test.mambatest.fetcher.PhotoFetcher;
-import ru.mamba.test.mambatest.fetcher.Session;
+import ru.mamba.test.mambatest.api.Session;
 import ru.mamba.test.mambatest.model.Album;
 
 public class AlbumsFragment extends Fragment implements AdapterView.OnItemClickListener, Callback1<Albums.Model> {

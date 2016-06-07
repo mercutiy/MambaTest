@@ -1,7 +1,6 @@
 package ru.mamba.test.mambatest.api;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -29,11 +28,10 @@ import ru.mamba.test.mambatest.api.callback.Callback3;
 import ru.mamba.test.mambatest.api.controller.Controller;
 
 import ru.mamba.test.mambatest.api.exception.NotAuthException;
-import ru.mamba.test.mambatest.fetcher.ApiException;
-import ru.mamba.test.mambatest.fetcher.ConnectionException;
-import ru.mamba.test.mambatest.fetcher.FetchException;
-import ru.mamba.test.mambatest.fetcher.JsonException;
-import ru.mamba.test.mambatest.fetcher.Session;
+import ru.mamba.test.mambatest.api.exception.ApiException;
+import ru.mamba.test.mambatest.api.exception.ConnectionException;
+import ru.mamba.test.mambatest.api.exception.FetchException;
+import ru.mamba.test.mambatest.api.exception.JsonException;
 
 
 public class Fetcher extends AsyncTask<Request, Void, Controller[]> {

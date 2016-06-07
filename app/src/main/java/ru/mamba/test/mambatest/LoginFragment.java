@@ -13,7 +13,7 @@ import android.widget.Toast;
 import ru.mamba.test.mambatest.api.Fetcher;
 import ru.mamba.test.mambatest.api.callback.Callback1;
 import ru.mamba.test.mambatest.api.controller.Login;
-import ru.mamba.test.mambatest.fetcher.Session;
+import ru.mamba.test.mambatest.api.Session;
 
 public class LoginFragment extends Fragment implements View.OnClickListener, Callback1<Login.Model> {
 

@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
-import ru.mamba.test.mambatest.fetcher.Session;
+import ru.mamba.test.mambatest.api.Session;
 
 public class LoginActivity extends AppCompatActivity {
 
