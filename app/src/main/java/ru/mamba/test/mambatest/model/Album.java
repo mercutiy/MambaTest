@@ -27,7 +27,9 @@ public class Album extends Model {
         super(json);
         setId(json.getInt(F_INT_ID));
         setTitle(json.getString(F_STR_TITLE));
-        setPhoto(json.getString(F_STR_PHOTO));
+        if (!json.isNull(F_STR_PHOTO)) {
+            setPhoto(json.getString(F_STR_PHOTO));
+        }
     }
 
     public String getPhoto() {

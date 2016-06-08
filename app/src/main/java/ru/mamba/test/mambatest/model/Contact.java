@@ -20,7 +20,7 @@ public class Contact extends Model {
     public Contact(JSONObject json) throws JSONException {
         super(json);
         setId(json.getInt(F_INT_ID));
-        setId(json.getInt(F_INT_MESSAGES));
+        setMessages(json.getInt(F_INT_MESSAGES));
         setAnketa(new Anketa(json.getJSONObject(F_OBJ_ANKETA)));
     }
 
