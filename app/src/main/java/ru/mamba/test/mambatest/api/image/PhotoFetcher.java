@@ -1,7 +1,6 @@
-package ru.mamba.test.mambatest.fetcher;
+package ru.mamba.test.mambatest.api.image;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;

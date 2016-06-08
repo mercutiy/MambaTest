@@ -2,7 +2,18 @@ package ru.mamba.test.mambatest.model;
 
 import android.graphics.Bitmap;
 
-public class Album {
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import ru.mamba.test.mambatest.api.controller.Login;
+
+public class Album extends Model {
+
+    protected final static String F_INT_ID = "id";
+
+    protected final static String F_STR_TITLE = "name";
+
+    protected final static String F_STR_PHOTO = "coverUrl";
 
     private int mId;
 
@@ -12,10 +23,13 @@ public class Album {
 
     private Bitmap mPhotoBitmap;
 
-    public Album(int id, String title, String photo) {
-        mId = id;
-        mPhoto = photo;
-        mTitle = title;
+    public Album(JSONObject json) throws JSONException {
+        super(json);
+        setId(json.getInt(F_INT_ID));
+        setTitle(json.getString(F_STR_TITLE));
+        if (!json.isNull(F_STR_PHOTO)) {
+            setPhoto(json.getString(F_STR_PHOTO));
+        }
     }
 
     public String getPhoto() {
@@ -28,6 +42,18 @@ public class Album {
 
     public int getId() {
         return mId;
+    }
+
+    public void setId(int id) {
+        mId = id;
+    }
+
+    public void setTitle(String title) {
+        mTitle = title;
+    }
+
+    public void setPhoto(String photo) {
+        mPhoto = photo;
     }
 
     public Bitmap getPhotoBitmap() {

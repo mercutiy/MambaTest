@@ -1,11 +1,16 @@
-package ru.mamba.test.mambatest.fetcher;
+package ru.mamba.test.mambatest.api;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Request {
+
+    private static final String sBaseUrl = "http://api.mobile-api.ru/v5.2.20.0/";
 
     public static final String GET = "GET";
 
@@ -65,5 +70,28 @@ public class Request {
 
     public JSONObject getPost() {
         return mPost;
+    }
+
+    public URL getURL() throws MalformedURLException {
+        String stringParams = "";
+        if (getParams() != null) {
+            stringParams = "?";
+            for (Map.Entry<String, String> entry : getParams().entrySet()) {
+                stringParams = stringParams + entry.getKey() + "=" + entry.getValue() + "&";
+            }
+        }
+        return new URL(sBaseUrl + getPath() + stringParams);
+    }
+
+    public String getRawPost() {
+        return getPost().toString();
+    }
+
+    public JSONObject getRequestForBatch() throws JSONException {
+        JSONObject request = new JSONObject();
+        request.put("method", getMethod());
+        request.put("uri", getPath());
+        request.put("params", getPost() != null ? getPost() : new JSONObject());
+        return request;
     }
 }
