@@ -1,13 +1,13 @@
-package ru.mamba.test.mambatest;
+package ru.mamba.test.mambatest.activity;
 
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 
-public class AnketaActivity extends AppCompatActivity {
+import ru.mamba.test.mambatest.fragment.AnketaFragment;
+import ru.mamba.test.mambatest.R;
+
+public class Anketa extends AppCompatActivity {
 
     public static String EXTRA_ANKETA_ID = "ANKETA_ID";
 
