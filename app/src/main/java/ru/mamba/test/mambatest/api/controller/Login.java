@@ -19,15 +19,10 @@ public class Login extends Controller<Login.Model> {
 
     private final static String TAG = Login.class.getSimpleName();
 
-    public Login(String login, String password) {
+    public Login(String login, String password) throws JSONException {
         JSONObject jsonRequest = new JSONObject();
-        try {
-            jsonRequest.put("login", login);
-            jsonRequest.put("password", password);
-        } catch (JSONException e) {
-            Log.e(TAG, "json creating error", e);
-            return;
-        }
+        jsonRequest.put("login", login);
+        jsonRequest.put("password", password);
         setRequest(new Request(URI, METHOD, null, jsonRequest));
     }
 

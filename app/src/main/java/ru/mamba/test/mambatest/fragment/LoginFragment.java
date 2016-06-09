@@ -10,12 +10,16 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import org.json.JSONException;
+
 import ru.mamba.test.mambatest.R;
 import ru.mamba.test.mambatest.activity.Profile;
 import ru.mamba.test.mambatest.api.Fetcher;
 import ru.mamba.test.mambatest.api.callback.Callback1;
+import ru.mamba.test.mambatest.api.controller.Controller;
 import ru.mamba.test.mambatest.api.controller.Login;
 import ru.mamba.test.mambatest.api.Session;
+import ru.mamba.test.mambatest.helper.ErrorHandler;
 
 public class LoginFragment extends Fragment implements View.OnClickListener, Callback1<Login.Model> {
 
@@ -45,8 +49,16 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Cal
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.button_login) {
+            Controller login;
+            try {
+                login = new Login(mEditLogin.getText().toString(), mEditPassword.getText().toString());
+            } catch (JSONException e) {
+                ErrorHandler.getInstance().handle(getActivity(), e);
+                return;
+            }
+
             Fetcher fetcher = new Fetcher(getActivity(), this);
-            fetcher.fetch(new Login(mEditLogin.getText().toString(), mEditPassword.getText().toString()));
+            fetcher.fetch(login);
         }
     }
 
