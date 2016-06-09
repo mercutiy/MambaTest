@@ -6,7 +6,7 @@
                 android:paddingLeft="@dimen/activity_horizontal_margin"
                 android:paddingRight="@dimen/activity_horizontal_margin"
                 android:paddingTop="@dimen/activity_vertical_margin"
-                tools:context=".NewAlbumFragment"
+                tools:context=".fragment.NewAlbumFragment"
                 tools:showIn="@layout/activity_new_album"
                 android:orientation="vertical"
                 android:id="@+id/layout_form">

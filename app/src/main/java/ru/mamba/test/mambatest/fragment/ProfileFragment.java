@@ -1,4 +1,4 @@
-package ru.mamba.test.mambatest;
+package ru.mamba.test.mambatest.fragment;
 
 import android.content.Intent;
 import android.support.v4.app.Fragment;
@@ -14,9 +14,11 @@ import android.widget.TextView;
 
 import org.apache.commons.lang3.StringUtils;
 
+import ru.mamba.test.mambatest.R;
+import ru.mamba.test.mambatest.activity.Albums;
+import ru.mamba.test.mambatest.activity.Contacts;
 import ru.mamba.test.mambatest.api.Fetcher;
 import ru.mamba.test.mambatest.api.callback.Callback3;
-import ru.mamba.test.mambatest.api.controller.Albums;
 import ru.mamba.test.mambatest.api.controller.Folders;
 import ru.mamba.test.mambatest.api.controller.Profile;
 import ru.mamba.test.mambatest.api.Session;
@@ -25,7 +27,7 @@ import ru.mamba.test.mambatest.model.Folder;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class ProfileFragment extends Fragment implements View.OnClickListener, Callback3<Profile.Model, Albums.Model, Folders.Model> {
+public class ProfileFragment extends Fragment implements View.OnClickListener, Callback3<Profile.Model, ru.mamba.test.mambatest.api.controller.Albums.Model, Folders.Model> {
 
     private static final String TAG = LoginFragment.class.getCanonicalName();
 
@@ -65,7 +67,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, C
         Fetcher fetcher = new Fetcher(getActivity(), this);
         fetcher.fetch(
             new Profile(),
-            new Albums(Session.getInstance(getActivity()).getAnketaId(), false, 0),
+            new ru.mamba.test.mambatest.api.controller.Albums(Session.getInstance(getActivity()).getAnketaId(), false, 0),
             new Folders()
         );
 
@@ -75,17 +77,17 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, C
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.button_contacts) {
-            Intent intent = new Intent(getActivity(), ContactsActivity.class);
+            Intent intent = new Intent(getActivity(), Contacts.class);
             getActivity().startActivity(intent);
 
         } else if (v.getId() == R.id.button_albums) {
-            Intent intent = new Intent(getActivity(), AlbumsActivity.class);
+            Intent intent = new Intent(getActivity(), Albums.class);
             getActivity().startActivity(intent);
         }
     }
 
     @Override
-    public void onResponse(Profile.Model profile, Albums.Model albums, Folders.Model folders) {
+    public void onResponse(Profile.Model profile, ru.mamba.test.mambatest.api.controller.Albums.Model albums, Folders.Model folders) {
         mGreeting.setText(profile.getProfile().getGreeting());
         mInterests.setText(StringUtils.join(profile.getProfile().getInterests(), " "));
         mPhoto.setImageBitmap(profile.getProfile().getPhoto());

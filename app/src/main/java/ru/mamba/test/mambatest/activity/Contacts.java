@@ -1,4 +1,4 @@
-package ru.mamba.test.mambatest;
+package ru.mamba.test.mambatest.activity;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -7,7 +7,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
-public class ContactsActivity extends AppCompatActivity {
+import ru.mamba.test.mambatest.R;
+
+public class Contacts extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -1,4 +1,4 @@
-package ru.mamba.test.mambatest;
+package ru.mamba.test.mambatest.fragment;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import org.apache.commons.lang3.StringUtils;
 
+import ru.mamba.test.mambatest.R;
 import ru.mamba.test.mambatest.api.Fetcher;
 import ru.mamba.test.mambatest.api.callback.Callback1;
 import ru.mamba.test.mambatest.api.controller.Anketa;

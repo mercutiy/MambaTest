@@ -1,4 +1,4 @@
-package ru.mamba.test.mambatest;
+package ru.mamba.test.mambatest.fragment;
 
 import android.content.Intent;
 import android.support.v4.app.Fragment;
@@ -20,6 +20,8 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
+import ru.mamba.test.mambatest.R;
+import ru.mamba.test.mambatest.activity.Albums;
 import ru.mamba.test.mambatest.api.Fetcher;
 import ru.mamba.test.mambatest.api.callback.Callback1;
 import ru.mamba.test.mambatest.api.controller.AlbumForm;
@@ -84,7 +86,7 @@ public class NewAlbumFragment extends Fragment implements Callback1<FormBuilder>
         mFormBuilder = formBuilder;
         if (formBuilder.getMessage() != null) {
             Toast.makeText(getActivity(), formBuilder.getMessage(), Toast.LENGTH_LONG).show();
-            Intent intent = new Intent(getActivity(), AlbumsActivity.class);
+            Intent intent = new Intent(getActivity(), Albums.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
             return;

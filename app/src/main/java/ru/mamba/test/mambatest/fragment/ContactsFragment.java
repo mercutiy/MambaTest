@@ -1,4 +1,4 @@
-package ru.mamba.test.mambatest;
+package ru.mamba.test.mambatest.fragment;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -20,12 +20,13 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import ru.mamba.test.mambatest.R;
+import ru.mamba.test.mambatest.activity.Anketa;
 import ru.mamba.test.mambatest.api.Fetcher;
 import ru.mamba.test.mambatest.api.callback.Callback1;
 import ru.mamba.test.mambatest.api.controller.Contacts;
 import ru.mamba.test.mambatest.api.image.PhotoFetcher;
 import ru.mamba.test.mambatest.api.Session;
-import ru.mamba.test.mambatest.model.Anketa;
 import ru.mamba.test.mambatest.model.Contact;
 
 public class ContactsFragment
@@ -35,7 +36,7 @@ public class ContactsFragment
 
     private ContactAdapter mContactAdapter;
 
-    private PhotoFetcher<Anketa> mPhotoFetcher;
+    private PhotoFetcher<ru.mamba.test.mambatest.model.Anketa> mPhotoFetcher;
 
     int mTotal = -1;
 
@@ -51,10 +52,10 @@ public class ContactsFragment
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mPhotoFetcher = new PhotoFetcher<Anketa>(new Handler());
-        mPhotoFetcher.setListener(new PhotoFetcher.Listener<Anketa>() {
+        mPhotoFetcher = new PhotoFetcher<ru.mamba.test.mambatest.model.Anketa>(new Handler());
+        mPhotoFetcher.setListener(new PhotoFetcher.Listener<ru.mamba.test.mambatest.model.Anketa>() {
             @Override
-            public void onPhotoDownloaded(Anketa anketa, Bitmap bitmap) {
+            public void onPhotoDownloaded(ru.mamba.test.mambatest.model.Anketa anketa, Bitmap bitmap) {
                 anketa.setPhoto(bitmap);
                 if (isVisible()) {
                     mContactAdapter.notifyDataSetChanged();
@@ -124,7 +125,7 @@ public class ContactsFragment
             Bitmap noPhoto = BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.nophoto);
             ImageView imageView = (ImageView)convertView.findViewById(R.id.image_view_contact_photo);
 
-            Anketa anketa = contact.getAnketa();
+            ru.mamba.test.mambatest.model.Anketa anketa = contact.getAnketa();
             if (anketa.getPhotoSrc() == null || "".equals(anketa.getPhotoSrc())) {
                 imageView.setImageBitmap(noPhoto);
             } else if (anketa.getPhoto() != null) {
@@ -144,8 +145,8 @@ public class ContactsFragment
             return;
         }
 
-        Intent intent = new Intent(getActivity(), AnketaActivity.class);
-        intent.putExtra(AnketaActivity.EXTRA_ANKETA_ID, contact.getAnketa().getId());
+        Intent intent = new Intent(getActivity(), Anketa.class);
+        intent.putExtra(Anketa.EXTRA_ANKETA_ID, contact.getAnketa().getId());
         startActivity(intent);
     }
 

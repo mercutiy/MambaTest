@@ -1,4 +1,4 @@
-package ru.mamba.test.mambatest;
+package ru.mamba.test.mambatest.fragment;
 
 import android.content.Intent;
 import android.support.v4.app.Fragment;
@@ -10,6 +10,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import ru.mamba.test.mambatest.R;
+import ru.mamba.test.mambatest.activity.Profile;
 import ru.mamba.test.mambatest.api.Fetcher;
 import ru.mamba.test.mambatest.api.callback.Callback1;
 import ru.mamba.test.mambatest.api.controller.Login;
@@ -61,7 +63,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Cal
         session.setSecret(login.getAuthSecret());
         session.setAnketaId(login.getProfile().getId());
 
-        Intent intent = new Intent(getActivity(), ProfileActivity.class);
+        Intent intent = new Intent(getActivity(), Profile.class);
         getActivity().startActivity(intent);
     }
 }

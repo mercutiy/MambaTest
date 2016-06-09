@@ -19,7 +19,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 
-import ru.mamba.test.mambatest.LoginActivity;
+import ru.mamba.test.mambatest.activity.Login;
 import ru.mamba.test.mambatest.R;
 import ru.mamba.test.mambatest.api.callback.Callback;
 import ru.mamba.test.mambatest.api.callback.Callback1;
@@ -123,7 +123,7 @@ public class Fetcher extends AsyncTask<Request, Void, Controller[]> {
         mDialog.dismiss();
         if (mReauthorise) {
             getSession().setSid("");
-            Intent intent = new Intent(getActivity(), LoginActivity.class);
+            Intent intent = new Intent(getActivity(), Login.class);
             getActivity().startActivity(intent);
             return;
         }

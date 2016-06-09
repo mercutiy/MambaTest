@@ -1,4 +1,4 @@
-package ru.mamba.test.mambatest;
+package ru.mamba.test.mambatest.fragment;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import ru.mamba.test.mambatest.R;
 import ru.mamba.test.mambatest.api.callback.Callback1;
 import ru.mamba.test.mambatest.api.controller.Albums;
 import ru.mamba.test.mambatest.api.controller.Controller;
