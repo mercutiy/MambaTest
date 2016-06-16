@@ -55,7 +55,7 @@ public class Anketa extends Controller<Anketa.Model> {
             Bitmap photo = new ImageFetcher().fetchImage(getModel().getAnketa().getPhotoSrc());
             getModel().getAnketa().setPhoto(photo);
         } catch (IOException e) {
-
+            // todo Do nothing since it's just a photo or not?
         }
     }
 
