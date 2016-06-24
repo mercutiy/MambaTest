@@ -57,7 +57,10 @@ public class Fetcher extends AsyncTask<Request, Void, Controller[]> {
 
     public void fetch(Controller... controllers) {
         if (controllers.length < 1 || controllers.length > 3) {
-            ErrorHandler.getInstance().handle(getActivity(), new TooManyControllersException());
+            ErrorHandler.getInstance().handle(
+                getActivity(),
+                new TooManyControllersException("Wrong requests count in batch query")
+            );
             return;
         }
 
@@ -67,7 +70,7 @@ public class Fetcher extends AsyncTask<Request, Void, Controller[]> {
         try {
             request = buildRequest(mControllers);
         } catch (JSONException e) {
-            ErrorHandler.getInstance().handle(getActivity(), e);
+            ErrorHandler.getInstance().handle(getActivity(), e, "Cant generate batch request json");
             return;
         }
 
@@ -107,8 +110,13 @@ public class Fetcher extends AsyncTask<Request, Void, Controller[]> {
     }
 
     private void saveResponses(Throwable exception) {
+        saveResponses(exception, null);
+    }
+
+    private void saveResponses(Throwable exception, String errorMessage) {
         for (Controller controller : mControllers) {
             controller.setError(exception);
+            controller.setErrorMessage(errorMessage);
         }
     }
 
@@ -126,7 +134,10 @@ public class Fetcher extends AsyncTask<Request, Void, Controller[]> {
         String output;
         try {
             output = sendRequest(params.length > 0 ? params[0] : null);
-        } catch (Exception e) {
+        } catch (IOException e) {
+            saveResponses(e, "Fetching api IO error");
+            return mControllers;
+        } catch (ApiException e) {
             saveResponses(e);
             return mControllers;
         }
@@ -134,7 +145,7 @@ public class Fetcher extends AsyncTask<Request, Void, Controller[]> {
         try {
             saveResponses(output);
         } catch (JSONException e) {
-            saveResponses(e);
+            saveResponses(e, "Unpredictable json layout in api response");
         }
 
         return mControllers;
@@ -146,7 +157,7 @@ public class Fetcher extends AsyncTask<Request, Void, Controller[]> {
 
         for (Controller controller : controllers) {
             if (controller.getError() != null) {
-                ErrorHandler.getInstance().handle(getActivity(), controller.getError());
+                ErrorHandler.getInstance().handle(getActivity(), controller.getError(), controller.getErrorMessage());
                 return;
             }
         }
@@ -189,13 +200,13 @@ public class Fetcher extends AsyncTask<Request, Void, Controller[]> {
             connection.connect();
 
             if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
-                throw new ApiException();
+                throw new ApiException("Http response status " + connection.getResponseCode());
             }
 
             InputStream input = connection.getInputStream();
             StringBuffer buffer = new StringBuffer();
             if (input == null) {
-                throw new ApiException();
+                throw new ApiException("Connection error");
             }
             reader = new BufferedReader(new InputStreamReader(input));
 
@@ -205,7 +216,7 @@ public class Fetcher extends AsyncTask<Request, Void, Controller[]> {
             }
 
             if (buffer.length() == 0) {
-                throw new ApiException();
+                throw new ApiException("Empty api answer");
             }
 
             if (connection.getHeaderFields().containsKey("Set-Cookie")) {

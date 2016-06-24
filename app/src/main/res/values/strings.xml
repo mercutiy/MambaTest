@@ -39,8 +39,8 @@
     <string name="error_common">Some error occurred</string>
     <string name="error_message_common">Some error occurred. Try again latter</string>
 
-    <string name="error_connect">Connection error</string>
-    <string name="error_message_connect">Connection error</string>
+    <string name="error_io">Connection error</string>
+    <string name="error_message_io">Connection error</string>
 
     <string name="error_api">API error</string>
     <string name="error_message_api">API error. Try again latter</string>

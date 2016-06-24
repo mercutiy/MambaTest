@@ -53,7 +53,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Cal
             try {
                 login = new Login(mEditLogin.getText().toString(), mEditPassword.getText().toString());
             } catch (JSONException e) {
-                ErrorHandler.getInstance().handle(getActivity(), e);
+                ErrorHandler.getInstance().handle(getActivity(), e, "Cant generate login json");
                 return;
             }
 

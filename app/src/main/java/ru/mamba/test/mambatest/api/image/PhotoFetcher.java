@@ -88,7 +88,7 @@ public class PhotoFetcher<Token> extends HandlerThread {
                 }
             );
         } catch (IOException e) {
-            ErrorHandler.getInstance().handle(mActivity, e);
+            ErrorHandler.getInstance().handle(mActivity, e, "Fetching image IO error");
         }
     }
 

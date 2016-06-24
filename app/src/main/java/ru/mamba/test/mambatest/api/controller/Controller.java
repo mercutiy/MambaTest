@@ -23,6 +23,8 @@ public abstract class Controller<Model> {
 
     private Throwable mError;
 
+    private String mErrorMessage;
+
     private Model mModel;
 
     protected abstract Model parseResponse(JSONObject json) throws JSONException;
@@ -62,6 +64,14 @@ public abstract class Controller<Model> {
 
     public void setError(Throwable error) {
         mError = error;
+    }
+
+    public String getErrorMessage() {
+        return mErrorMessage;
+    }
+
+    public void setErrorMessage(String errorMessage) {
+        mErrorMessage = errorMessage;
     }
 
     protected void completeModel() {
