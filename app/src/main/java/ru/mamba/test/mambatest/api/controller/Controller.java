@@ -19,7 +19,11 @@ public abstract class Controller<Model> {
 
     protected Request mRequest;
 
-    private Response mResponse;
+    private JSONObject mResponse;
+
+    private Throwable mError;
+
+    private String mErrorMessage;
 
     private Model mModel;
 
@@ -33,17 +37,16 @@ public abstract class Controller<Model> {
         mRequest = request;
     }
 
-    public void setResponse(Response response) throws NotAuthException {
+    public void setResponse(JSONObject response) throws NotAuthException {
         mResponse = response;
         try {
-            if (this instanceof Authorise && !response.getJson().getBoolean(F_BOOL_AUTH)) {
+            if (this instanceof Authorise && !mResponse.getBoolean(F_BOOL_AUTH)) {
                 throw new NotAuthException();
             }
-            setModel(parseResponse(response.getJson()));
+            setModel(parseResponse(mResponse));
             completeModel();
         } catch (JSONException e) {
-            Log.e(TAG, "unpredictable json", e);
-            mResponse.setException(e);
+            setError(e);
         }
     }
 
@@ -53,6 +56,22 @@ public abstract class Controller<Model> {
 
     public void setModel(Model model) {
         mModel = model;
+    }
+
+    public Throwable getError() {
+        return mError;
+    }
+
+    public void setError(Throwable error) {
+        mError = error;
+    }
+
+    public String getErrorMessage() {
+        return mErrorMessage;
+    }
+
+    public void setErrorMessage(String errorMessage) {
+        mErrorMessage = errorMessage;
     }
 
     protected void completeModel() {

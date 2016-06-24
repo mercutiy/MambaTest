@@ -52,7 +52,7 @@ public class ContactsFragment
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mPhotoFetcher = new PhotoFetcher<ru.mamba.test.mambatest.model.Anketa>(new Handler());
+        mPhotoFetcher = new PhotoFetcher<ru.mamba.test.mambatest.model.Anketa>(new Handler(), getActivity());
         mPhotoFetcher.setListener(new PhotoFetcher.Listener<ru.mamba.test.mambatest.model.Anketa>() {
             @Override
             public void onPhotoDownloaded(ru.mamba.test.mambatest.model.Anketa anketa, Bitmap bitmap) {

@@ -1,5 +1,6 @@
 package ru.mamba.test.mambatest.api.image;
 
+import android.app.Activity;
 import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -9,6 +10,8 @@ import android.util.Log;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+
+import ru.mamba.test.mambatest.helper.ErrorHandler;
 
 public class PhotoFetcher<Token> extends HandlerThread {
 
@@ -24,6 +27,8 @@ public class PhotoFetcher<Token> extends HandlerThread {
 
     Listener<Token> mListener;
 
+    Activity mActivity;
+
     public interface Listener<Token> {
         void onPhotoDownloaded(Token token, Bitmap bitmap);
     }
@@ -32,9 +37,10 @@ public class PhotoFetcher<Token> extends HandlerThread {
         mListener = listener;
     }
 
-    public PhotoFetcher(Handler responseHandler) {
+    public PhotoFetcher(Handler responseHandler, Activity activity) {
         super(TAG);
         mResponseHandler = responseHandler;
+        mActivity = activity;
     }
 
     public void queueThumbnail(Token token, String url) {
@@ -82,7 +88,7 @@ public class PhotoFetcher<Token> extends HandlerThread {
                 }
             );
         } catch (IOException e) {
-            Log.e(TAG, "Error downloading image", e);
+            ErrorHandler.getInstance().handle(mActivity, e, "Fetching image IO error");
         }
     }
 
