@@ -1,5 +1,7 @@
 package ru.mamba.test.mambatest.api;
 
+import android.net.Uri;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -10,7 +12,11 @@ import java.util.Map;
 
 public class Request {
 
-    private static final String sBaseUrl = "http://api.mobile-api.ru/v5.2.20.0/";
+    private static final String API_SCHEME = "http";
+
+    private static final String API_DOMAIN = "api.mobile-api.ru";
+
+    private static final String API_VERSION = "v5.2.20.0";
 
     public static final String GET = "GET";
 
@@ -73,14 +79,14 @@ public class Request {
     }
 
     public URL getURL() throws MalformedURLException {
-        String stringParams = "";
+        Uri.Builder builder = new Uri.Builder();
+        builder.scheme(API_SCHEME).authority(API_DOMAIN).appendPath(API_VERSION).appendEncodedPath(getPath());
         if (getParams() != null) {
-            stringParams = "?";
             for (Map.Entry<String, String> entry : getParams().entrySet()) {
-                stringParams = stringParams + entry.getKey() + "=" + entry.getValue() + "&";
+                builder.appendQueryParameter(entry.getKey(), entry.getValue());
             }
         }
-        return new URL(sBaseUrl + getPath() + stringParams);
+        return new URL(builder.toString());
     }
 
     public String getRawPost() {
