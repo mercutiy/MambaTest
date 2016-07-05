@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -27,6 +28,7 @@ import ru.mamba.test.mambatest.api.callback.Callback2;
 import ru.mamba.test.mambatest.api.callback.Callback3;
 import ru.mamba.test.mambatest.api.controller.Controller;
 
+import ru.mamba.test.mambatest.api.controller.SecretAuth;
 import ru.mamba.test.mambatest.api.exception.NotAuthException;
 import ru.mamba.test.mambatest.api.exception.ApiException;
 import ru.mamba.test.mambatest.api.exception.TooManyControllersException;
@@ -78,8 +80,8 @@ public class Fetcher {
 
         mAsyncTask = new AsyncTask<Request, Void, Controller[]>() {
             @Override
-            protected Controller[] doInBackground(Request... params) {
-                return doInBackgroundAsync(params);
+            protected Controller[] doInBackground(Request... request) {
+                return doInBackgroundAsync(request);
             }
 
             @Override
@@ -113,20 +115,15 @@ public class Fetcher {
         return new Request("/", Request.POST, null, batch);
     }
 
-    private void saveResponses(String json) throws JSONException {
-        try {
-            JSONObject response = new JSONObject(json);
-            if (mControllers.length > 1) {
-                JSONArray container = response.getJSONArray("sysResponsesContainer");
-                for (int i = 0; i < container.length(); i++) {
-                    mControllers[i].setResponse(container.getJSONObject(i));
-                }
-            } else {
-                mControllers[0].setResponse(response);
+    private void saveResponses(String json) throws JSONException, NotAuthException {
+        JSONObject response = new JSONObject(json);
+        if (mControllers.length > 1) {
+            JSONArray container = response.getJSONArray("sysResponsesContainer");
+            for (int i = 0; i < container.length(); i++) {
+                mControllers[i].setResponse(container.getJSONObject(i));
             }
-        } catch (NotAuthException e) {
-            mReauthorise = true;
-            return;
+        } else {
+            mControllers[0].setResponse(response);
         }
     }
 
@@ -149,10 +146,10 @@ public class Fetcher {
         mDialog.show();
     }
 
-    protected Controller[] doInBackgroundAsync(Request... params) {
+    protected Controller[] doInBackgroundAsync(Request... request) {
         String output;
         try {
-            output = sendRequest(params.length > 0 ? params[0] : null);
+            output = sendRequest(request.length > 0 ? request[0] : null);
         } catch (IOException e) {
             saveResponses(e, "Fetching api IO error");
             return mControllers;
@@ -165,9 +162,28 @@ public class Fetcher {
             saveResponses(output);
         } catch (JSONException e) {
             saveResponses(e, "Unpredictable json layout in api response");
+        } catch (NotAuthException e) {
+            try {
+                Controller secretAuth = new SecretAuth(getSession().getSecret());
+
+            } catch (JSONException ee) {
+                saveResponses(ee, "Cant generate secret auth json");
+            }
         }
 
         return mControllers;
+    }
+
+    @Nullable
+    private String safeRequest(Request request) {
+        try {
+            return sendRequest(request);
+        } catch (IOException e) {
+            saveResponses(e, "Fetching api IO error");
+        } catch (ApiException e) {
+            saveResponses(e);
+        }
+        return null;
     }
 
     protected void onPostExecuteAsync(Controller[] controllers) {
