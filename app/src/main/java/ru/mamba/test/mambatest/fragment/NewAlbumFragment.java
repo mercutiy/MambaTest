@@ -47,6 +47,7 @@ public class NewAlbumFragment extends Fragment implements Callback1<FormBuilder>
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mFetcher = new Fetcher(getActivity(), this);
         setHasOptionsMenu(true);
         setRetainInstance(true);
     }
@@ -63,7 +64,6 @@ public class NewAlbumFragment extends Fragment implements Callback1<FormBuilder>
         View view = inflater.inflate(R.layout.fragment_new_album, container, false);
         mLayout = (LinearLayout)view.findViewById(R.id.layout_form);
 
-        mFetcher = new Fetcher(getActivity(), this);
         mFetcher.fetch(new AlbumForm());
 
         return view;
@@ -73,7 +73,6 @@ public class NewAlbumFragment extends Fragment implements Callback1<FormBuilder>
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_submit_album) {
             mLayout.removeAllViews();
-            mFetcher = new Fetcher(getActivity(), this);
             mFetcher.fetch(new AlbumNew(mFormBuilder.getForm().getJson()));
             return true;
 

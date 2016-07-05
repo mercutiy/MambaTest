@@ -76,9 +76,8 @@ public class AlbumsFragment extends Fragment implements AdapterView.OnItemClickL
         listView.setAdapter(mAlbumAdapter);
         listView.setOnItemClickListener(this);
 
-        Fetcher albumsFetcher = new Fetcher(getActivity(), this);
-        Controller controller = new Albums(Session.getInstance(getActivity()).getAnketaId(), true, 1);
-        albumsFetcher.fetch(controller);
+        Fetcher fetcher = new Fetcher(getActivity(), this);
+        fetcher.fetch(new Albums(Session.getInstance(getActivity()).getAnketaId(), true, 1));
 
         return view;
     }

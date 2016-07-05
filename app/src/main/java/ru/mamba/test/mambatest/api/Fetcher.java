@@ -33,7 +33,7 @@ import ru.mamba.test.mambatest.api.exception.TooManyControllersException;
 import ru.mamba.test.mambatest.helper.ErrorHandler;
 
 
-public class Fetcher extends AsyncTask<Request, Void, Controller[]> {
+public class Fetcher {
 
     private static final String TAG = Fetcher.class.getSimpleName();
 
@@ -46,6 +46,8 @@ public class Fetcher extends AsyncTask<Request, Void, Controller[]> {
     private Controller[] mControllers;
 
     private ProgressDialog mDialog;
+
+    private AsyncTask<Request, Void, Controller[]> mAsyncTask;
 
     private boolean mReauthorise = false;
 
@@ -74,7 +76,26 @@ public class Fetcher extends AsyncTask<Request, Void, Controller[]> {
             return;
         }
 
-        execute(request);
+        mAsyncTask = new AsyncTask<Request, Void, Controller[]>() {
+            @Override
+            protected Controller[] doInBackground(Request... params) {
+                return doInBackgroundAsync(params);
+            }
+
+            @Override
+            protected void onPostExecute(Controller[] controllers) {
+                super.onPostExecute(controllers);
+                onPostExecuteAsync(controllers);
+            }
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                onPreExecuteAsync();
+            }
+        };
+
+        mAsyncTask.execute(request);
     }
 
     private Request buildRequest(Controller[] controllers) throws JSONException {
@@ -120,8 +141,7 @@ public class Fetcher extends AsyncTask<Request, Void, Controller[]> {
         }
     }
 
-    @Override
-    protected void onPreExecute() {
+    protected void onPreExecuteAsync() {
         mDialog = new ProgressDialog(getActivity());
         mDialog.setMessage(mActivity.getResources().getString(R.string.loading));
         mDialog.setIndeterminate(true);
@@ -129,8 +149,7 @@ public class Fetcher extends AsyncTask<Request, Void, Controller[]> {
         mDialog.show();
     }
 
-    @Override
-    protected Controller[] doInBackground(Request... params) {
+    protected Controller[] doInBackgroundAsync(Request... params) {
         String output;
         try {
             output = sendRequest(params.length > 0 ? params[0] : null);
@@ -151,8 +170,7 @@ public class Fetcher extends AsyncTask<Request, Void, Controller[]> {
         return mControllers;
     }
 
-    @Override
-    protected void onPostExecute(Controller[] controllers) {
+    protected void onPostExecuteAsync(Controller[] controllers) {
         mDialog.dismiss();
 
         for (Controller controller : controllers) {
