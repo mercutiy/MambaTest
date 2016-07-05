@@ -66,6 +66,7 @@ public class ContactsFragment
         mPhotoFetcher.getLooper();
 
         mFolderId = Session.getInstance(getActivity()).getFolderId();
+
         mFetcher = new Fetcher(getActivity(), this);
 
         setHasOptionsMenu(true);
@@ -163,7 +164,6 @@ public class ContactsFragment
             (totalItemCount >= mCurrentTotal && mCurrentTotal + limit <= mTotal) || mCurrentTotal == -1
         ) {
             mCurrentTotal = totalItemCount + limit;
-            mFetcher = new Fetcher(getActivity(), this);
             mFetcher.fetch(new Contacts(mFolderId, totalItemCount, 10));
         }
     }
