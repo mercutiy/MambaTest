@@ -17,6 +17,8 @@ public abstract class Controller<Model> {
 
     protected final static String F_OBJ_PROFILE = "profile";
 
+    protected final static String F_INT_ERROR_CODE = "errorCode";
+
     protected Request mRequest;
 
     private JSONObject mResponse;

@@ -165,6 +165,15 @@ public class Fetcher {
         } catch (NotAuthException e) {
             try {
                 Controller secretAuth = new SecretAuth(getSession().getSecret());
+                String secretResponse = safeRequest(secretAuth.getRequest());
+                if (secretResponse == null) {
+                    return mControllers;
+                }
+                try {
+                    secretAuth.setResponse(new JSONObject(secretResponse));
+                } catch (NotAuthException ee) {
+
+                }
 
             } catch (JSONException ee) {
                 saveResponses(ee, "Cant generate secret auth json");

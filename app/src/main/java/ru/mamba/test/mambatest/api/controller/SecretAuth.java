@@ -5,7 +5,7 @@ import org.json.JSONObject;
 
 import ru.mamba.test.mambatest.api.Request;
 
-public class SecretAuth extends Controller {
+public class SecretAuth extends Controller<SecretAuth.Model> {
 
     private final static String METHOD = Request.POST;
 
@@ -20,7 +20,26 @@ public class SecretAuth extends Controller {
     }
 
     @Override
-    protected Object parseResponse(JSONObject json) throws JSONException {
-        return null;
+    protected Model parseResponse(JSONObject json) throws JSONException {
+        Model response = new Model();
+
+        if (json.has(F_INT_ERROR_CODE)) {
+            response.setErrorCode(json.getInt(F_INT_ERROR_CODE));
+        }
+
+        return response;
+    }
+
+    public class Model {
+
+        private int mErrorCode;
+
+        public int getErrorCode() {
+            return mErrorCode;
+        }
+
+        public void setErrorCode(int errorCode) {
+            this.mErrorCode = errorCode;
+        }
     }
 }
