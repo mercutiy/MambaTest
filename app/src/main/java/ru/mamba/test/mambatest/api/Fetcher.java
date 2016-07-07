@@ -147,14 +147,9 @@ public class Fetcher {
     }
 
     protected Controller[] doInBackgroundAsync(Request... request) {
-        String output;
-        try {
-            output = sendRequest(request.length > 0 ? request[0] : null);
-        } catch (IOException e) {
-            saveResponses(e, "Fetching api IO error");
-            return mControllers;
-        } catch (ApiException e) {
-            saveResponses(e);
+
+        String output = safeRequest(request.length > 0 ? request[0] : null);
+        if (output == null) {
             return mControllers;
         }
 
@@ -165,19 +160,19 @@ public class Fetcher {
         } catch (NotAuthException e) {
             try {
                 Controller secretAuth = new SecretAuth(getSession().getSecret());
-                String secretResponse = safeRequest(secretAuth.getRequest());
-                if (secretResponse == null) {
+                String response = safeRequest(secretAuth.getRequest());
+                if (response == null) {
                     return mControllers;
                 }
-                try {
-                    secretAuth.setResponse(new JSONObject(secretResponse));
-                } catch (NotAuthException ee) {
-                    mReauthorise = true;
-                }
-
+                secretAuth.setResponse(new JSONObject(response));
             } catch (JSONException ee) {
-                saveResponses(ee, "Cant generate secret auth json");
+                saveResponses(ee, "Cant generate or parse secret auth json");
+                return mControllers;
+            } catch (NotAuthException ee) {
+                // todo
             }
+
+            return doInBackgroundAsync(request);
         }
 
         return mControllers;

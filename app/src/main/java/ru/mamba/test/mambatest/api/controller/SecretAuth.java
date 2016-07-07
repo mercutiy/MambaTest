@@ -5,17 +5,17 @@ import org.json.JSONObject;
 
 import ru.mamba.test.mambatest.api.Request;
 
-public class SecretAuth extends Controller<SecretAuth.Model> {
+public class SecretAuth extends Controller<SecretAuth.Model> implements Authorise  {
 
     private final static String METHOD = Request.POST;
 
     private final static String URI = "/login/secret/";
 
-    private final static String SECRET = "secret";
+    private final static String A_STR_SECRET = "secret";
 
     public SecretAuth(String secret) throws JSONException {
         JSONObject jsonRequest = new JSONObject();
-        jsonRequest.put(SECRET, secret);
+        jsonRequest.put(A_STR_SECRET, secret);
         setRequest(new Request(URI, METHOD, null, jsonRequest));
     }
 
@@ -39,7 +39,7 @@ public class SecretAuth extends Controller<SecretAuth.Model> {
         }
 
         public void setErrorCode(int errorCode) {
-            this.mErrorCode = errorCode;
+            mErrorCode = errorCode;
         }
     }
 }
