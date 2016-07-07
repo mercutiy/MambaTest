@@ -172,7 +172,7 @@ public class Fetcher {
                 try {
                     secretAuth.setResponse(new JSONObject(secretResponse));
                 } catch (NotAuthException ee) {
-
+                    mReauthorise = true;
                 }
 
             } catch (JSONException ee) {
