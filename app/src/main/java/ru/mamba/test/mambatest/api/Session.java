@@ -74,6 +74,10 @@ public class Session {
         mPreferences.edit().putString(PREF_FIELD_SECRET, secret).apply();
     }
 
+    public String getSecret() {
+        return mPreferences.getString(PREF_FIELD_SECRET, "");
+    }
+
     public int getAnketaId() {
         if (mAnketaId == -1) {
             mAnketaId = mPreferences.getInt(PREF_FIELD_ANKETA, 0);

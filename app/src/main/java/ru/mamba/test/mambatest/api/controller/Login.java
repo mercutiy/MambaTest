@@ -17,12 +17,16 @@ public class Login extends Controller<Login.Model> {
 
     private final static String F_STR_SECRET = "authSecret";
 
+    private final static String A_STR_LOGIN = "login";
+
+    private final static String A_STR_PASSWORD = "password";
+
     private final static String TAG = Login.class.getSimpleName();
 
     public Login(String login, String password) throws JSONException {
         JSONObject jsonRequest = new JSONObject();
-        jsonRequest.put("login", login);
-        jsonRequest.put("password", password);
+        jsonRequest.put(A_STR_LOGIN, login);
+        jsonRequest.put(A_STR_PASSWORD, password);
         setRequest(new Request(URI, METHOD, null, jsonRequest));
     }
 
