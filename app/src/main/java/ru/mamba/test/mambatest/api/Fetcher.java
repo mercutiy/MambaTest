@@ -169,7 +169,8 @@ public class Fetcher {
                 saveResponses(ee, "Cant generate or parse secret auth json");
                 return mControllers;
             } catch (NotAuthException ee) {
-                // todo
+                mReauthorise = true;
+                return mControllers;
             }
 
             return doInBackgroundAsync(request);
