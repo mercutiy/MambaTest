@@ -30,36 +30,11 @@
 
     </LinearLayout>
 
-    <ScrollView
+    <FrameLayout
+        android:id="@+id/fragment_profile"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_above="@id/buttons">
-
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <ImageView
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:layout_centerInParent="true"
-                android:adjustViewBounds="true"
-                android:scaleType="fitStart"
-                android:id="@+id/image_view_photo"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/text_view_slogan"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/text_view_interests"/>
-
-        </LinearLayout>
-
-    </ScrollView>
+    </FrameLayout>
 
 </RelativeLayout>

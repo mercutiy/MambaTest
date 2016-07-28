@@ -3,6 +3,7 @@ package ru.mamba.test.mambatest.fragment;
 import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
@@ -34,12 +35,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, C
     public ProfileFragment() {
     }
 
-    private ImageView mPhoto;
-
-    private TextView mGreeting;
-
-    private TextView mInterests;
-
     private Button mAlbumButton;
 
     private Button mContactButton;
@@ -55,9 +50,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, C
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
 
-        mPhoto = (ImageView)view.findViewById(R.id.image_view_photo);
-        mGreeting = (TextView)view.findViewById(R.id.text_view_slogan);
-        mInterests = (TextView)view.findViewById(R.id.text_view_interests);
         mAlbumButton = (Button)view.findViewById(R.id.button_albums);
         mContactButton = (Button)view.findViewById(R.id.button_contacts);
 
@@ -88,17 +80,23 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, C
 
     @Override
     public void onResponse(Profile.Model profile, ru.mamba.test.mambatest.api.controller.Albums.Model albums, Folders.Model folders) {
-        mGreeting.setText(profile.getProfile().getGreeting());
-        mInterests.setText(StringUtils.join(profile.getProfile().getInterests(), " "));
-        mPhoto.setImageBitmap(profile.getProfile().getPhoto());
+        AnketaFragment fragment = AnketaFragment.newInstance(profile.getProfile().getId());
+
+        getActivity().getSupportFragmentManager()
+            .beginTransaction()
+            .add(R.id.fragment_profile, fragment)
+            .commit();
+
         mAlbumButton.setText(getResources().getQuantityString(R.plurals.number_of_albums, albums.getAlbums().length, albums.getAlbums().length));
         Folder folder = folders.getFolders()[0];
         mContactButton.setText(getResources().getQuantityString(R.plurals.number_of_contacts, folder.getContactCount(), folder.getContactCount()));
+
         ActionBar ab = ((AppCompatActivity)getActivity()).getSupportActionBar();
         if (ab != null) {
             String title = profile.getProfile().getName() + " " + String.valueOf(profile.getProfile().getAge()) + " " + getResources().getString(R.string.string_its_you);
             ab.setTitle(title);
         }
+
         Session.getInstance(getActivity()).setFolderId(folder.getId());
     }
 }
