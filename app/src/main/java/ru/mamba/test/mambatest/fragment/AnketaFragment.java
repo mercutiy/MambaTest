@@ -14,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import ru.mamba.test.mambatest.R;
 import ru.mamba.test.mambatest.api.Fetcher;
+import ru.mamba.test.mambatest.api.Session;
 import ru.mamba.test.mambatest.api.callback.Callback1;
 import ru.mamba.test.mambatest.api.controller.Anketa;
 
@@ -23,6 +24,8 @@ public class AnketaFragment extends Fragment implements Callback1<Anketa.Model> 
     private static final String ARG_ANKETA_ID = "ANKETA_ID";
 
     private int mAnketaId;
+
+    private ru.mamba.test.mambatest.model.Anketa mAnketa;
 
     private TextView mGreeting;
 
@@ -38,6 +41,12 @@ public class AnketaFragment extends Fragment implements Callback1<Anketa.Model> 
         Bundle args = new Bundle();
         args.putInt(ARG_ANKETA_ID, anketaId);
         fragment.setArguments(args);
+        return fragment;
+    }
+
+    public static AnketaFragment newInstance(ru.mamba.test.mambatest.model.Anketa anketa) {
+        AnketaFragment fragment = new AnketaFragment();
+        fragment.mAnketa = anketa;
         return fragment;
     }
 
@@ -59,21 +68,32 @@ public class AnketaFragment extends Fragment implements Callback1<Anketa.Model> 
         mInterests = (TextView)view.findViewById(R.id.text_view_anketa_interests);
         mPhoto = (ImageView)view.findViewById(R.id.image_view_anketa_photo);
 
-        Fetcher fetcher = new Fetcher(getActivity(), this);
-        fetcher.fetch(new Anketa(mAnketaId));
+        if (mAnketa != null) {
+            showAnketa(mAnketa);
+        } else {
+            Fetcher fetcher = new Fetcher(getActivity(), this);
+            fetcher.fetch(new Anketa(mAnketaId));
+        }
 
         return view;
     }
 
     @Override
     public void onResponse(Anketa.Model anketa) {
-        mGreeting.setText(anketa.getAnketa().getGreeting());
-        mInterests.setText(StringUtils.join(anketa.getAnketa().getInterests(), " "));
-        mPhoto.setImageBitmap(anketa.getAnketa().getPhoto());
-        ActionBar ab = ((AppCompatActivity)getActivity()).getSupportActionBar();
-        if (ab != null) {
-            String title = anketa.getAnketa().getName() + " " + String.valueOf(anketa.getAnketa().getAge());
-            ab.setTitle(title);
+        showAnketa(anketa.getAnketa());
+    }
+
+    private void showAnketa(ru.mamba.test.mambatest.model.Anketa anketa) {
+        mGreeting.setText(anketa.getGreeting());
+        mInterests.setText(StringUtils.join(anketa.getInterests(), " "));
+        mPhoto.setImageBitmap(anketa.getPhoto());
+        ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
+        if (actionBar != null) {
+            String title = anketa.getName() + " " + String.valueOf(anketa.getAge());
+            if (anketa.getId() == Session.getInstance(getActivity()).getAnketaId()) {
+                title += " " + getResources().getString(R.string.string_its_you);
+            }
+            actionBar.setTitle(title);
         }
     }
 
