@@ -8,9 +8,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.apache.commons.lang3.StringUtils;
+
+import java.util.zip.Inflater;
 
 import ru.mamba.test.mambatest.R;
 import ru.mamba.test.mambatest.api.Fetcher;
@@ -29,7 +32,7 @@ public class AnketaFragment extends Fragment implements Callback1<Anketa.Model> 
 
     private TextView mGreeting;
 
-    private TextView mInterests;
+    private LinearLayout mInterests;
 
     private ImageView mPhoto;
 
@@ -65,7 +68,7 @@ public class AnketaFragment extends Fragment implements Callback1<Anketa.Model> 
         View view = inflater.inflate(R.layout.fragment_anketa, container, false);
 
         mGreeting = (TextView)view.findViewById(R.id.text_view_anketa_greeting);
-        mInterests = (TextView)view.findViewById(R.id.text_view_anketa_interests);
+        mInterests = (LinearLayout)view.findViewById(R.id.layout_anketa_interests);
         mPhoto = (ImageView)view.findViewById(R.id.image_view_anketa_photo);
 
         if (mAnketa != null) {
@@ -85,7 +88,11 @@ public class AnketaFragment extends Fragment implements Callback1<Anketa.Model> 
 
     private void showAnketa(ru.mamba.test.mambatest.model.Anketa anketa) {
         mGreeting.setText(anketa.getGreeting());
-        mInterests.setText(StringUtils.join(anketa.getInterests(), " "));
+        LayoutInflater inflater = getLayoutInflater(new Bundle());
+        for (String interest : anketa.getInterests()) {
+            View interestView = inflater.inflate(R.layout.anketa_tag, null);
+            mInterests.addView(interestView);
+        }
         mPhoto.setImageBitmap(anketa.getPhoto());
         ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
         if (actionBar != null) {
