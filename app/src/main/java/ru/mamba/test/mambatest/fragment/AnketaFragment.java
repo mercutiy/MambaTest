@@ -10,13 +10,12 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import org.apache.commons.lang3.StringUtils;
-
 import ru.mamba.test.mambatest.R;
 import ru.mamba.test.mambatest.api.Fetcher;
 import ru.mamba.test.mambatest.api.Session;
 import ru.mamba.test.mambatest.api.callback.Callback1;
 import ru.mamba.test.mambatest.api.controller.Anketa;
+import ru.mamba.test.mambatest.misc.TagLayout;
 
 public class AnketaFragment extends Fragment implements Callback1<Anketa.Model> {
 
@@ -29,7 +28,7 @@ public class AnketaFragment extends Fragment implements Callback1<Anketa.Model> 
 
     private TextView mGreeting;
 
-    private TextView mInterests;
+    private TagLayout mInterests;
 
     private ImageView mPhoto;
 
@@ -65,7 +64,7 @@ public class AnketaFragment extends Fragment implements Callback1<Anketa.Model> 
         View view = inflater.inflate(R.layout.fragment_anketa, container, false);
 
         mGreeting = (TextView)view.findViewById(R.id.text_view_anketa_greeting);
-        mInterests = (TextView)view.findViewById(R.id.text_view_anketa_interests);
+        mInterests = (TagLayout)view.findViewById(R.id.layout_anketa_interests);
         mPhoto = (ImageView)view.findViewById(R.id.image_view_anketa_photo);
 
         if (mAnketa != null) {
@@ -85,7 +84,12 @@ public class AnketaFragment extends Fragment implements Callback1<Anketa.Model> 
 
     private void showAnketa(ru.mamba.test.mambatest.model.Anketa anketa) {
         mGreeting.setText(anketa.getGreeting());
-        mInterests.setText(StringUtils.join(anketa.getInterests(), " "));
+        LayoutInflater inflater = getLayoutInflater(new Bundle());
+        for (String interest : anketa.getInterests()) {
+            View interestView = inflater.inflate(R.layout.anketa_tag, null);
+            ((TextView)interestView.findViewById(R.id.anketa_tag_title)).setText(interest);
+            mInterests.addView(interestView);
+        }
         mPhoto.setImageBitmap(anketa.getPhoto());
         ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
         if (actionBar != null) {

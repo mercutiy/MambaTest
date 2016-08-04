@@ -18,9 +18,9 @@
         android:layout_height="wrap_content"
         android:id="@+id/text_view_anketa_greeting"/>
 
-    <TextView
+    <ru.mamba.test.mambatest.misc.TagLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/text_view_anketa_interests"/>
+        android:id="@+id/layout_anketa_interests"/>
 
 </LinearLayout>
