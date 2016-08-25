@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.json.JSONException;
 
@@ -11,6 +12,7 @@ import java.io.IOException;
 
 import ru.mamba.test.mambatest.R;
 import ru.mamba.test.mambatest.api.exception.ApiException;
+import ru.mamba.test.mambatest.api.exception.ErrorCodeException;
 
 public class ErrorHandler {
 
@@ -41,6 +43,18 @@ public class ErrorHandler {
             iconId = R.drawable.ic_action_error;
             titleId = R.string.error_api;
             messageId = R.string.error_message_api;
+        } else if (exception instanceof ErrorCodeException) {
+            int errorCode = ((ErrorCodeException) exception).getErrorCode();
+            switch (errorCode) {
+                case ErrorCodeException.EC_USER_NOT_EXISTS:
+                    Toast.makeText(activity, R.string.error_code_user_not_exists, Toast.LENGTH_LONG).show();
+                    break;
+                default:
+                    Toast.makeText(activity, R.string.error_code_default_error, Toast.LENGTH_LONG).show();
+                    break;
+            }
+            activity.finish();
+            return;
         } else {
             iconId = R.drawable.ic_action_error;
             titleId = R.string.error_common;

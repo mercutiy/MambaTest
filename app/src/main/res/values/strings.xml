@@ -48,5 +48,9 @@
     <string name="error_json">Json error</string>
     <string name="error_message_json">Unsupported JSON structure</string>
 
+    <string name="error_code_user_not_exists">User does not exist</string>
+
+    <string name="error_code_default_error">Unknown error occurred</string>
+
     <string name="ok">Ok</string>
 </resources>

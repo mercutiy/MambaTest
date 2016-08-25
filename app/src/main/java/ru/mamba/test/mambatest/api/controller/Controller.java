@@ -6,7 +6,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import ru.mamba.test.mambatest.api.Request;
-import ru.mamba.test.mambatest.api.Response;
+import ru.mamba.test.mambatest.api.exception.ErrorCodeException;
 import ru.mamba.test.mambatest.api.exception.NotAuthException;
 
 public abstract class Controller<Model> {
@@ -45,9 +45,12 @@ public abstract class Controller<Model> {
             if (this instanceof Authorise && !mResponse.getBoolean(F_BOOL_AUTH)) {
                 throw new NotAuthException();
             }
+            checkForErrorCode(mResponse);
             setModel(parseResponse(mResponse));
             completeModel();
         } catch (JSONException e) {
+            setError(e);
+        } catch (ErrorCodeException e) {
             setError(e);
         }
     }
@@ -78,5 +81,11 @@ public abstract class Controller<Model> {
 
     protected void completeModel() {
 
+    }
+
+    protected void checkForErrorCode(JSONObject json) throws JSONException, ErrorCodeException {
+        if (json.has(F_INT_ERROR_CODE)) {
+            throw new ErrorCodeException(json.getInt(F_INT_ERROR_CODE));
+        }
     }
 }
