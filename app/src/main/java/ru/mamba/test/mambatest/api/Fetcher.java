@@ -70,11 +70,15 @@ public class Fetcher {
 
         mControllers = controllers;
 
+        reFetch();
+    }
+
+    public void reFetch() {
         Request request;
         try {
             request = buildRequest(mControllers);
         } catch (JSONException e) {
-            ErrorHandler.getInstance().handle(getActivity(), e, "Cant generate batch request json");
+            ErrorHandler.getInstance().handle(this, e, "Cant generate batch request json");
             return;
         }
 
@@ -196,7 +200,7 @@ public class Fetcher {
 
         for (Controller controller : controllers) {
             if (controller.getError() != null) {
-                ErrorHandler.getInstance().handle(getActivity(), controller.getError(), controller.getErrorMessage());
+                ErrorHandler.getInstance().handle(this, controller.getError(), controller.getErrorMessage());
                 return;
             }
         }
