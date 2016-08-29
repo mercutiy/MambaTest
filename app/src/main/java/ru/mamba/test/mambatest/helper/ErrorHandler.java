@@ -16,7 +16,7 @@ import ru.mamba.test.mambatest.api.Fetcher;
 import ru.mamba.test.mambatest.api.exception.ApiException;
 import ru.mamba.test.mambatest.api.exception.ErrorCodeException;
 
-public class ErrorHandler {
+public class ErrorHandler implements DialogInterface.OnClickListener {
 
     private static ErrorHandler sInstance = new ErrorHandler();
 
@@ -119,14 +119,23 @@ public class ErrorHandler {
         ad.setIcon(iconId);
         ad.setTitle(titleId);
         ad.setMessage(messageId);
-        ad.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                if (mFetcher != null) {
-                    mFetcher.reFetch();
-                }
-            }
-        });
+        ad.setPositiveButton(R.string.ok, this);
+        if (mFetcher != null) {
+            ad.setNeutralButton(R.string.try_again, this);
+        }
         ad.show();
+    }
+
+    @Override
+    public void onClick(DialogInterface dialog, int which) {
+        if (which == DialogInterface.BUTTON_POSITIVE) {
+            dialog.dismiss();
+            return;
+        }
+
+        if (which == DialogInterface.BUTTON_NEUTRAL) {
+            mFetcher.reFetch();
+            return;
+        }
     }
 }
