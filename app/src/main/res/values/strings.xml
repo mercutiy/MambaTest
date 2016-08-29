@@ -53,4 +53,5 @@
     <string name="error_code_default_error">Unknown error occurred</string>
 
     <string name="ok">Ok</string>
+    <string name="try_again">Try again</string>
 </resources>

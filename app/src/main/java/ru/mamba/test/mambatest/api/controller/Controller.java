@@ -40,6 +40,8 @@ public abstract class Controller<Model> {
     }
 
     public void setResponse(JSONObject response) throws NotAuthException {
+        setError(null);
+        setErrorMessage(null);
         mResponse = response;
         try {
             if (this instanceof Authorise && !mResponse.getBoolean(F_BOOL_AUTH)) {

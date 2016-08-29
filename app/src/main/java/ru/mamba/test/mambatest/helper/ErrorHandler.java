@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.widget.TableRow;
 import android.widget.Toast;
 
 import org.json.JSONException;
@@ -11,10 +12,11 @@ import org.json.JSONException;
 import java.io.IOException;
 
 import ru.mamba.test.mambatest.R;
+import ru.mamba.test.mambatest.api.Fetcher;
 import ru.mamba.test.mambatest.api.exception.ApiException;
 import ru.mamba.test.mambatest.api.exception.ErrorCodeException;
 
-public class ErrorHandler {
+public class ErrorHandler implements DialogInterface.OnClickListener {
 
     private static ErrorHandler sInstance = new ErrorHandler();
 
@@ -25,35 +27,89 @@ public class ErrorHandler {
     private ErrorHandler() {
     }
 
+    private String mMessage;
+
+    private Throwable mException;
+
+    private Activity mActivity;
+
+    private Fetcher mFetcher;
+
+    public void handle(Fetcher fetcher, Throwable exception, String message) {
+        setFetcher(fetcher);
+        setActivity(fetcher.getActivity());
+        setException(exception);
+        setMessage(message);
+        handle();
+    }
+
+    public void handle(Fetcher fetcher, Throwable exception) {
+        setFetcher(fetcher);
+        setActivity(fetcher.getActivity());
+        setException(exception);
+        setMessage(exception.getMessage());
+        handle();
+    }
+
+    public void handle(Activity activity, Throwable exception) {
+        setActivity(activity);
+        setException(exception);
+        setMessage(exception.getMessage());
+        handle();
+    }
+
     public void handle(Activity activity, Throwable exception, String message) {
-        Log.e("", message != null ? message : exception.getMessage(), exception);
-        AlertDialog.Builder ad = new AlertDialog.Builder(activity);
+        setActivity(activity);
+        setException(exception);
+        setMessage(message);
+        handle();
+    }
+
+    public void setMessage(String message) {
+        mMessage = message;
+    }
+
+    public void setException(Throwable exception) {
+        mException = exception;
+    }
+
+    public void setActivity(Activity activity) {
+        mActivity = activity;
+    }
+
+    public void setFetcher(Fetcher fetcher) {
+        mFetcher = fetcher;
+    }
+
+    private void handle() {
+        Log.e("", mMessage, mException);
+        AlertDialog.Builder ad = new AlertDialog.Builder(mActivity);
         int iconId;
         int titleId;
         int messageId;
-        if (exception instanceof IOException) {
+        if (mException instanceof IOException) {
             iconId = R.drawable.ic_action_error;
             titleId = R.string.error_io;
             messageId = R.string.error_message_io;
-        } else if (exception instanceof JSONException) {
+        } else if (mException instanceof JSONException) {
             iconId = R.drawable.ic_action_error;
             titleId = R.string.error_json;
             messageId = R.string.error_message_json;
-        } else if (exception instanceof ApiException) {
+        } else if (mException instanceof ApiException) {
             iconId = R.drawable.ic_action_error;
             titleId = R.string.error_api;
             messageId = R.string.error_message_api;
-        } else if (exception instanceof ErrorCodeException) {
-            int errorCode = ((ErrorCodeException) exception).getErrorCode();
+        } else if (mException instanceof ErrorCodeException) {
+            int errorCode = ((ErrorCodeException) mException).getErrorCode();
             switch (errorCode) {
                 case ErrorCodeException.EC_USER_NOT_EXISTS:
-                    Toast.makeText(activity, R.string.error_code_user_not_exists, Toast.LENGTH_LONG).show();
+                    Toast.makeText(mActivity, R.string.error_code_user_not_exists, Toast.LENGTH_LONG).show();
                     break;
                 default:
-                    Toast.makeText(activity, R.string.error_code_default_error, Toast.LENGTH_LONG).show();
+                    Toast.makeText(mActivity, R.string.error_code_default_error, Toast.LENGTH_LONG).show();
                     break;
             }
-            activity.finish();
+            mActivity.finish();
             return;
         } else {
             iconId = R.drawable.ic_action_error;
@@ -63,16 +119,23 @@ public class ErrorHandler {
         ad.setIcon(iconId);
         ad.setTitle(titleId);
         ad.setMessage(messageId);
-        ad.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                // todo implement try again button
-            }
-        });
+        ad.setPositiveButton(R.string.ok, this);
+        if (mFetcher != null) {
+            ad.setNeutralButton(R.string.try_again, this);
+        }
         ad.show();
     }
 
-    public void handle(Activity activity, Throwable exception) {
-        handle(activity, exception, null);
+    @Override
+    public void onClick(DialogInterface dialog, int which) {
+        if (which == DialogInterface.BUTTON_POSITIVE) {
+            dialog.dismiss();
+            return;
+        }
+
+        if (which == DialogInterface.BUTTON_NEUTRAL) {
+            mFetcher.reFetch();
+            return;
+        }
     }
 }
