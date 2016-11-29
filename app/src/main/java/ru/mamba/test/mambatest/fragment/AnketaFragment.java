@@ -90,7 +90,7 @@ public class AnketaFragment extends Fragment implements Callback1<Anketa.Model> 
             ((TextView)interestView.findViewById(R.id.anketa_tag_title)).setText(interest);
             mInterests.addView(interestView);
         }
-        mPhoto.setImageBitmap(anketa.getPhoto());
+        mPhoto.setImageBitmap(anketa.getPhoto().getBitmap());
         ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
         if (actionBar != null) {
             String title = anketa.getName() + " " + String.valueOf(anketa.getAge());

@@ -1,6 +1,7 @@
 package ru.mamba.test.mambatest.model;
 
 import android.graphics.Bitmap;
+import android.provider.ContactsContract;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -8,6 +9,8 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import ru.mamba.test.mambatest.model.sub.Photo;
 
 public class Anketa extends Model {
 
@@ -49,9 +52,7 @@ public class Anketa extends Model {
 
     private String[] mInterests;
 
-    private String mPhotoSrc;
-
-    private Bitmap mPhoto;
+    private Photo mPhoto;
 
     public Anketa(JSONObject json) throws JSONException {
         super(json);
@@ -64,7 +65,7 @@ public class Anketa extends Model {
         }
 
         if (!isDeleted()) {
-            setPhotoSrc(json.getString(F_STR_PHOTO));
+            setPhoto(json.getString(F_STR_PHOTO));
             setAge(json.getInt(F_INT_AGE));
         }
 
@@ -139,19 +140,11 @@ public class Anketa extends Model {
         mInterests = interests;
     }
 
-    public Bitmap getPhoto() {
+    public Photo getPhoto() {
         return mPhoto;
     }
 
-    public void setPhoto(Bitmap photo) {
-        mPhoto = photo;
-    }
-
-    public String getPhotoSrc() {
-        return mPhotoSrc;
-    }
-
-    public void setPhotoSrc(String photoSrc) {
-        mPhotoSrc = photoSrc;
+    public void setPhoto(String url) {
+        mPhoto = new Photo(url);
     }
 }

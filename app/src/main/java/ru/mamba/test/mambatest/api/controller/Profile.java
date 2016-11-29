@@ -9,6 +9,7 @@ import java.io.IOException;
 
 import ru.mamba.test.mambatest.api.Request;
 import ru.mamba.test.mambatest.api.image.ImageFetcher;
+import ru.mamba.test.mambatest.model.sub.Photo;
 
 public class Profile extends Controller<Profile.Model> implements Authorise {
 
@@ -48,8 +49,8 @@ public class Profile extends Controller<Profile.Model> implements Authorise {
     protected void completeModel() {
         super.completeModel();
         try {
-            Bitmap photo = new ImageFetcher().fetchImage(getModel().getProfile().getPhotoSrc());
-            getModel().getProfile().setPhoto(photo);
+            Bitmap photo = new ImageFetcher().fetchImage(getModel().getProfile().getPhoto().getUrl());
+            getModel().getProfile().getPhoto().setBitmap(photo);
         } catch (IOException e) {
 
         }

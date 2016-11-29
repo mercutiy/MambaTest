@@ -25,8 +25,10 @@ import ru.mamba.test.mambatest.activity.Anketa;
 import ru.mamba.test.mambatest.api.Fetcher;
 import ru.mamba.test.mambatest.api.callback.Callback1;
 import ru.mamba.test.mambatest.api.controller.Contacts;
-import ru.mamba.test.mambatest.api.image.PhotoFetcher;
 import ru.mamba.test.mambatest.api.Session;
+import ru.mamba.test.mambatest.misc.ImageCacher;
+import ru.mamba.test.mambatest.misc.PhotoFetcher;
+import ru.mamba.test.mambatest.misc.PhotoManager;
 import ru.mamba.test.mambatest.model.Contact;
 
 public class ContactsFragment
@@ -36,7 +38,9 @@ public class ContactsFragment
 
     private ContactAdapter mContactAdapter;
 
-    private PhotoFetcher<ru.mamba.test.mambatest.model.Anketa> mPhotoFetcher;
+    private PhotoFetcher mPhotoFetcher;
+
+    private PhotoManager mPhotoManager;
 
     int mTotal = -1;
 
@@ -52,22 +56,13 @@ public class ContactsFragment
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mPhotoFetcher = new PhotoFetcher<ru.mamba.test.mambatest.model.Anketa>(new Handler(), getActivity());
-        mPhotoFetcher.setListener(new PhotoFetcher.Listener<ru.mamba.test.mambatest.model.Anketa>() {
-            @Override
-            public void onPhotoDownloaded(ru.mamba.test.mambatest.model.Anketa anketa, Bitmap bitmap) {
-                anketa.setPhoto(bitmap);
-                if (isVisible()) {
-                    mContactAdapter.notifyDataSetChanged();
-                }
-            }
-        });
-        mPhotoFetcher.start();
-        mPhotoFetcher.getLooper();
 
         mFolderId = Session.getInstance(getActivity()).getFolderId();
 
         mFetcher = new Fetcher(getActivity(), this);
+
+        mPhotoManager = new PhotoManager(BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.nophoto));
+        mPhotoManager.setCacher(new ImageCacher(getActivity()));
 
         setHasOptionsMenu(true);
         setRetainInstance(true);
@@ -76,13 +71,7 @@ public class ContactsFragment
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mPhotoFetcher.quit();
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        mPhotoFetcher.clearQueue();
+        mPhotoManager.destroy();
     }
 
     @Override
@@ -123,17 +112,8 @@ public class ContactsFragment
             nameAgeView.setText(contact.getAnketa().getName() + ", " + String.valueOf(contact.getAnketa().getAge()));
             messagesView.setText(getResources().getQuantityString(R.plurals.number_of_messages, contact.getMessages(), contact.getMessages()));
 
-            Bitmap noPhoto = BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.nophoto);
             ImageView imageView = (ImageView)convertView.findViewById(R.id.image_view_contact_photo);
-
-            ru.mamba.test.mambatest.model.Anketa anketa = contact.getAnketa();
-            if (anketa.getPhotoSrc() == null || "".equals(anketa.getPhotoSrc())) {
-                imageView.setImageBitmap(noPhoto);
-            } else if (anketa.getPhoto() != null) {
-                imageView.setImageBitmap(anketa.getPhoto());
-            } else {
-                mPhotoFetcher.queueThumbnail(anketa, anketa.getPhotoSrc());
-            }
+            mPhotoManager.placePhoto(contact.getAnketa().getPhoto(), imageView);
 
             return convertView;
         }
